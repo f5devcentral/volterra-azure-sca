@@ -1,22 +1,28 @@
+module volterra {
+  source = "./volterra"
+
+  tenant_name           = var.tenant_name
+  namespace             = var.namespace
+  fleet_label           = var.fleet_label
+  url                   = var.api_url
+  api_p12_file          = var.api_p12_file
+  api_cert              = var.api_p12_file != "" ? "" : var.api_cert
+  api_key               = var.api_p12_file != "" ? "" : var.api_key
+  region                = var.region
+  location              = var.location
+  projectPrefix         = var.projectPrefix
+  sshPublicKeyPath      = var.sshPublicKeyPath
+  azure_client_id       = var.azure_client_id
+  azure_client_secret   = var.azure_client_secret
+  azure_tenant_id       = var.azure_tenant_id
+  azure_subscription_id = var.azure_subscription_id
+  gateway_type          = var.gateway_type
+}
+
 module azure {
   source        = "./azure"
   location      = var.location
   projectPrefix = var.projectPrefix
-}
-
-module volterra {
-  source = "./volterra"
-
-  tenant_name      = var.tenant_name
-  namespace        = var.namespace
-  url              = "https://${var.tenant_name}.console.ves.volterra.io/api"
-  api_p12_file     = var.api_p12_file
-  api_cert         = var.api_p12_file != "" ? "" : var.api_cert
-  api_key          = var.api_p12_file != "" ? "" : var.api_key
-  region           = var.region
-  location         = var.location
-  projectPrefix    = var.projectPrefix
-  sshPublicKeyPath = var.sshPublicKeyPath
 }
 
 # module firewall {

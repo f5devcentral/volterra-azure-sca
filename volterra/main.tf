@@ -16,25 +16,55 @@ provider volterra {
   url = var.url
 }
 
-resource volterra_token terraform_token {
-  name        = "token-${var.namespace}-${var.tenant_name}"
-  namespace   = "system"
-  description = "Coleman Terraform Created Token"
+resource volterra_token new_site {
+  #name        = "${var.namespace}-${var.tenant_name}-sca-token"
+  name      = "m-coleman-tf-sca-token"
+  namespace = "system"
 }
 
 output token {
-  value = volterra_token.terraform_token.id
+  value = volterra_token.new_site.id
+}
+
+resource volterra_cloud_credentials azure_site {
+  #name      = "${var.namespace}-${var.tenant_name}-azure-credentials"
+  name      = "m-coleman-tf-azure-credentials"
+  namespace = "system"
+
+  azure_client_secret {
+    client_id = var.azure_client_id
+    subscription_id = var.azure_subscription_id
+    tenant_id       = var.azure_tenant_id
+
+    client_secret {
+      blindfold_secret_info_internal {
+        location            = "string:///${base64encode(var.azure_client_secret)}"
+      }
+      clear_secret_info {
+        url      = "string:///${var.azure_client_secret}"
+      }
+      # blindfold_secret_info {
+      #   location            = "string:///${base64encode(var.azure_client_secret)}"
+      # }
+      #secret_encoding_type = "EncodingBase64"
+    }
+
+  }
 }
 
 resource volterra_azure_vnet_site azure_site {
-  name         = "${var.namespace}-${var.tenant_name}-vnet-site"
+  name         = "${var.tenant_name}-${var.namespace}-vnet-site"
   namespace    = "system"
   azure_region = var.location
 
   #ssh_key = var.ssh_key
 
   // One of the arguments from this list "azure_cred assisted" must be set
-  assisted = true
+  #assisted = true
+  azure_cred {
+    name      = volterra_cloud_credentials.azure_site.name
+    namespace = "system"
+  }
 
   // One of the arguments from this list "logs_streaming_disabled log_receiver" must be set
   logs_streaming_disabled = true
@@ -81,4 +111,11 @@ resource volterra_azure_vnet_site azure_site {
       primary_ipv4 = "10.1.0.0/16"
     }
   }
+}
+
+resource volterra_tf_params_action action_test {
+  site_name       = volterra_azure_vnet_site.azure_site.name
+  site_kind       = "azure_vnet_site"
+  action          = "plan"
+  wait_for_action = false
 }

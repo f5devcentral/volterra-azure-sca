@@ -29,11 +29,6 @@ variable deploymentType {
   description = "REQUIRED: This determines the type of deployment; one tier versus three tier: one_tier, three_tier"
   default     = "three_tier"
 }
-variable deployDemoApp {
-  type        = string
-  description = "OPTIONAL: Deploy Demo Application with Stack. Recommended to show functionality.  Options: deploy, anything else."
-  default     = "deploy"
-}
 variable sshPublicKey {
   type        = string
   description = "OPTIONAL: ssh public key for instances"
@@ -47,18 +42,18 @@ variable sshPublicKeyPath {
 variable api_p12_file {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "/Users/mcoleman/Documents/GitHub/volterra-azure-sca/creds/f5-sa.console.ves.volterra.io.api-creds.p12"
+  default     = "./api-creds.p12"
 }
 
 variable api_cert {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./creds/api2.cer"
+  default     = "./api2.cer"
 }
 variable api_key {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./creds/api.key"
+  default     = "./api.key"
 }
 
 variable tenant_name {
@@ -70,14 +65,22 @@ variable tenant_name {
 variable namespace {
   type        = string
   description = "REQUIRED:  This is your Volterra Namespace"
-  default     = "m-coleman"
+  default     = "namespace"
 }
 
-variable url {
+variable api_url {
   type        = string
   description = "REQUIRED:  This is your Volterra Namespace"
   default     = "https://playground.console.ves.volterra.io/api"
 }
+
+variable azure_client_id { default = ""}
+variable azure_client_secret { default = ""}
+variable azure_tenant_id { default = ""}
+variable azure_subscription_id { default = ""}
+
+variable gateway_type { default = "INGRESS_EGRESS_GATEWAY" }
+variable fleet_label  { default = "fleet_label" }
 
 # NETWORK
 variable cidr {
@@ -85,7 +88,7 @@ variable cidr {
   default     = "10.90.0.0/16"
 }
 
-variable subnets {
+variable azure_subnets {
   type        = map(string)
   description = "REQUIRED: Subnet CIDRs"
   default = {
