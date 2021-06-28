@@ -17,8 +17,8 @@ provider volterra {
 }
 
 resource volterra_token new_site {
-  #name        = "${var.namespace}-${var.tenant_name}-sca-token"
-  name      = "m-coleman-tf-sca-token"
+  name        = "${var.namespace}-${var.tenant_name}-sca-token"
+  #name      = "m-coleman-tf-sca-token"
   namespace = "system"
 }
 
@@ -27,26 +27,21 @@ output token {
 }
 
 resource volterra_cloud_credentials azure_site {
-  #name      = "${var.namespace}-${var.tenant_name}-azure-credentials"
-  name      = "m-coleman-tf-azure-credentials"
+  name      = "${var.namespace}-${var.tenant_name}-azure-credentials"
   namespace = "system"
 
   azure_client_secret {
-    client_id = var.azure_client_id
+    client_id       = var.azure_client_id
     subscription_id = var.azure_subscription_id
     tenant_id       = var.azure_tenant_id
 
     client_secret {
-      blindfold_secret_info_internal {
-        location            = "string:///${base64encode(var.azure_client_secret)}"
-      }
-      clear_secret_info {
-        url      = "string:///${var.azure_client_secret}"
-      }
-      # blindfold_secret_info {
-      #   location            = "string:///${base64encode(var.azure_client_secret)}"
+      # blindfold_secret_info_internal {
+      #   location = "string:///${var.azure_client_secret}"
       # }
-      #secret_encoding_type = "EncodingBase64"
+      clear_secret_info {
+        url = "string:///${var.azure_client_secret}"
+      }
     }
 
   }
@@ -56,10 +51,14 @@ resource volterra_azure_vnet_site azure_site {
   name         = "${var.tenant_name}-${var.namespace}-vnet-site"
   namespace    = "system"
   azure_region = var.location
+  ssh_key      = file(var.sshPublicKeyPath)
 
-  #ssh_key = var.ssh_key
+  machine_type = "Standard_D3_v2"
 
-  // One of the arguments from this list "azure_cred assisted" must be set
+  coordinates {
+    latitude  = "43.653"
+    longitude = "-79.383"
+  }
   #assisted = true
   azure_cred {
     name      = volterra_cloud_credentials.azure_site.name
@@ -73,6 +72,8 @@ resource volterra_azure_vnet_site azure_site {
   // One of the arguments from this list "ingress_egress_gw voltstack_cluster ingress_gw" must be set
 
   ingress_egress_gw {
+    azure_certified_hw = "azure-byol-multi-nic-voltmesh"
+
     no_forward_proxy         = true
     no_global_network        = true
     no_inside_static_routes  = true
@@ -81,32 +82,23 @@ resource volterra_azure_vnet_site azure_site {
 
     az_nodes {
       azure_az  = "1"
-      disk_size = "0"
+      disk_size = "80"
 
       inside_subnet {
-        // One of the arguments from this list "subnet_param subnet" must be set
-
         subnet_param {
           ipv4 = "10.1.1.0/24"
-          ipv6 = ""
         }
       }
       outside_subnet {
         subnet_param {
           ipv4 = "10.1.0.0/24"
-          ipv6 = ""
         }
       }
     }
 
-    azure_certified_hw = "azure-byol-multi-nic-voltmesh"
   }
   vnet {
-    // One of the arguments from this list "new_vnet existing_vnet" must be set
-
     new_vnet {
-      #resource_group = "${var.namespace}-${projectPrefix}"
-      #vnet_name      = "${var.namespace}-${projectPrefix}-vnet"
       autogenerate = true
       primary_ipv4 = "10.1.0.0/16"
     }
