@@ -74,13 +74,13 @@ variable api_url {
   default     = "https://playground.console.ves.volterra.io/api"
 }
 
-variable azure_client_id { default = ""}
-variable azure_client_secret { default = ""}
-variable azure_tenant_id { default = ""}
-variable azure_subscription_id { default = ""}
+variable azure_client_id { default = "" }
+variable azure_client_secret { default = "" }
+variable azure_tenant_id { default = "" }
+variable azure_subscription_id { default = "" }
 
 variable gateway_type { default = "INGRESS_EGRESS_GATEWAY" }
-variable fleet_label  { default = "fleet_label" }
+variable fleet_label { default = "fleet_label" }
 
 # NETWORK
 variable cidr {

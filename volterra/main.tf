@@ -17,7 +17,7 @@ provider volterra {
 }
 
 resource volterra_token new_site {
-  name        = "${var.namespace}-${var.tenant_name}-sca-token"
+  name = "${var.namespace}-${var.tenant_name}-sca-token"
   #name      = "m-coleman-tf-sca-token"
   namespace = "system"
 }
