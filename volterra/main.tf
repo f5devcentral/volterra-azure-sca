@@ -8,7 +8,7 @@ terraform {
   }
 }
 
-provider volterra {
+provider "volterra" {
   api_p12_file = var.api_p12_file
   api_cert     = var.api_p12_file != "" ? "" : var.api_cert
   api_key      = var.api_p12_file != "" ? "" : var.api_key
@@ -16,16 +16,16 @@ provider volterra {
   url = var.url
 }
 
-resource volterra_token new_site {
+resource "volterra_token" "new_site" {
   name      = "${var.namespace}-${var.tenant_name}-sca-token"
   namespace = "system"
 }
 
-output token {
+output "token" {
   value = volterra_token.new_site.id
 }
 
-resource volterra_cloud_credentials azure_site {
+resource "volterra_cloud_credentials" "azure_site" {
   name      = "${var.namespace}-${var.tenant_name}-azure-credentials"
   namespace = "system"
   azure_client_secret {
@@ -45,7 +45,7 @@ resource volterra_cloud_credentials azure_site {
   }
 }
 
- resource "volterra_azure_vnet_site" "azure_site" {
+resource "volterra_azure_vnet_site" "azure_site" {
   name         = "${var.tenant_name}-${var.namespace}-vnet-site"
   namespace    = "system"
   azure_region = var.location
@@ -96,7 +96,7 @@ resource volterra_cloud_credentials azure_site {
 
   }
   vnet {
-        new_vnet {
+    new_vnet {
       autogenerate = true
       primary_ipv4 = "10.1.0.0/16"
     }

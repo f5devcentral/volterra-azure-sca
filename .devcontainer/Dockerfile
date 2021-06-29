@@ -18,9 +18,9 @@ RUN sudo apt-get install terraform -y && terraform -install-autocomplete
 
 #RUN sudo apt-get install golang -y
 
-RUN git clone https://github.com/tfutils/tfenv.git $HOME/.tfenv 
-RUN echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> $HOME/.bash_profile 
-RUN mkdir -p $HOME/.local/bin/ 
+RUN git clone https://github.com/tfutils/tfenv.git $HOME/.tfenv
+RUN echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> $HOME/.bash_profile
+RUN mkdir -p $HOME/.local/bin/
 RUN ln -s $HOME/.tfenv/bin/* $HOME/.local/bin
 #RUN tfenv install 0.13.7 && \
 #    tfenv use 0.13.7
