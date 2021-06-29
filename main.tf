@@ -1,4 +1,4 @@
-module volterra {
+module "volterra" {
   source = "./volterra"
 
   tenant_name           = var.tenant_name
@@ -19,11 +19,11 @@ module volterra {
   gateway_type          = var.gateway_type
 }
 
-module azure {
-  source        = "./azure"
-  location      = var.location
-  projectPrefix = var.projectPrefix
-}
+# module azure {
+#   source        = "./azure"
+#   location      = var.location
+#   projectPrefix = var.projectPrefix
+# }
 
 # module firewall {
 #   source        = "./firewall"

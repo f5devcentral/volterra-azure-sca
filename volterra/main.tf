@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 0.13"
+  required_version = ">= 0.12"
   required_providers {
     volterra = {
       source  = "volterraedge/volterra"
@@ -17,8 +17,7 @@ provider volterra {
 }
 
 resource volterra_token new_site {
-  name = "${var.namespace}-${var.tenant_name}-sca-token"
-  #name      = "m-coleman-tf-sca-token"
+  name      = "${var.namespace}-${var.tenant_name}-sca-token"
   namespace = "system"
 }
 
@@ -29,31 +28,30 @@ output token {
 resource volterra_cloud_credentials azure_site {
   name      = "${var.namespace}-${var.tenant_name}-azure-credentials"
   namespace = "system"
-
   azure_client_secret {
     client_id       = var.azure_client_id
     subscription_id = var.azure_subscription_id
     tenant_id       = var.azure_tenant_id
-
     client_secret {
-      # blindfold_secret_info_internal {
-      #   location = "string:///${var.azure_client_secret}"
-      # }
+      #secret_encoding_type = "EncodingBase64"
+      blindfold_secret_info_internal {
+        location = "string:///${base64encode(var.azure_client_secret)}"
+      }
       clear_secret_info {
-        url = "string:///${var.azure_client_secret}"
+        url = "string:///${base64encode(var.azure_client_secret)}"
       }
     }
 
   }
 }
 
-resource volterra_azure_vnet_site azure_site {
+ resource "volterra_azure_vnet_site" "azure_site" {
   name         = "${var.tenant_name}-${var.namespace}-vnet-site"
   namespace    = "system"
   azure_region = var.location
-  ssh_key      = file(var.sshPublicKeyPath)
+  #ssh_key      = file(var.sshPublicKeyPath)
 
-  machine_type = "Standard_D3_v2"
+  #machine_type = "Standard_D3_v2"
 
   coordinates {
     latitude  = "43.653"
@@ -82,7 +80,7 @@ resource volterra_azure_vnet_site azure_site {
 
     az_nodes {
       azure_az  = "1"
-      disk_size = "80"
+      disk_size = "0"
 
       inside_subnet {
         subnet_param {
@@ -98,16 +96,16 @@ resource volterra_azure_vnet_site azure_site {
 
   }
   vnet {
-    new_vnet {
+        new_vnet {
       autogenerate = true
       primary_ipv4 = "10.1.0.0/16"
     }
   }
 }
 
-resource volterra_tf_params_action action_test {
-  site_name       = volterra_azure_vnet_site.azure_site.name
-  site_kind       = "azure_vnet_site"
-  action          = "plan"
-  wait_for_action = false
-}
+# resource "volterra_tf_params_action" "action_test" {
+#   site_name       = volterra_azure_vnet_site.azure_site.name
+#   site_kind       = "azure_vnet_site"
+#   action          = "plan"
+#   wait_for_action = false
+# }
