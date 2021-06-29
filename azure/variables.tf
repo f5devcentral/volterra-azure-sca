@@ -47,18 +47,18 @@ variable "sshPublicKeyPath" {
 variable "api_p12_file" {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./creds/f5-sa.console.ves.volterra.io.api-creds.p12"
+  default     = "./creds/api-creds.p12"
 }
 
 variable "api_cert" {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./creds/f5-sa.console.ves.volterra.io.api-creds.p12"
+  default     = "./creds/api-creds.p12"
 }
 variable "api_key" {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./creds/f5-sa.console.ves.volterra.io.api-creds.p12"
+  default     = "./creds/api-creds.p12"
 }
 
 variable "tenant_name" {
