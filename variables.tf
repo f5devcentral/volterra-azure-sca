@@ -64,13 +64,19 @@ variable "tenant_name" {
 
 variable "namespace" {
   type        = string
-  description = "REQUIRED:  This is your Volterra Namespace"
+  description = "REQUIRED:  This is your Volterra App Namespace"
   default     = "namespace"
+}
+
+variable "name" {
+  type        = string
+  description = "REQUIRED:  This is name for your deployment"
+  default     = "nebula"
 }
 
 variable "api_url" {
   type        = string
-  description = "REQUIRED:  This is your Volterra Namespace"
+  description = "REQUIRED:  This is your Volterra API url"
   default     = "https://playground.console.ves.volterra.io/api"
 }
 
