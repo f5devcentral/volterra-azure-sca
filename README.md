@@ -5,6 +5,8 @@ Volterra deploys Azure VNET site and some Azure bits.
 
 BIG-IP does not deploy yet.
 
+![Rough Diagram](/images/sce.png)
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
