@@ -23,6 +23,7 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_azure"></a> [azure](#module\_azure) | ./azure | n/a |
+| <a name="module_firewall"></a> [firewall](#module\_firewall) | ./firewall | n/a |
 | <a name="module_volterra"></a> [volterra](#module\_volterra) | ./volterra | n/a |
 
 ## Resources
@@ -47,7 +48,7 @@ No resources.
 | <a name="input_azure_subnets"></a> [azure\_subnets](#input\_azure\_subnets) | REQUIRED: Subnet CIDRs | `map(string)` | <pre>{<br>  "application": "10.90.10.0/24",<br>  "external": "10.90.1.0/24",<br>  "inspect_ext": "10.90.4.0/24",<br>  "inspect_int": "10.90.5.0/24",<br>  "internal": "10.90.2.0/24",<br>  "management": "10.90.0.0/24",<br>  "vdms": "10.90.3.0/24",<br>  "waf_ext": "10.90.6.0/24",<br>  "waf_int": "10.90.7.0/24"<br>}</pre> | no |
 | <a name="input_azure_subscription_id"></a> [azure\_subscription\_id](#input\_azure\_subscription\_id) | n/a | `string` | `""` | no |
 | <a name="input_azure_tenant_id"></a> [azure\_tenant\_id](#input\_azure\_tenant\_id) | n/a | `string` | `""` | no |
-| <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | REQUIRED: BIG-IP Version.  Note: verify available versions before using as images can change. | `string` | `"15.1.200000"` | no |
+| <a name="input_bigip_version"></a> [bigip\_version](#input\_bigip\_version) | REQUIRED: BIG-IP Version.  Note: verify available versions before using as images can change. | `string` | `"latest"` | no |
 | <a name="input_cidr"></a> [cidr](#input\_cidr) | REQUIRED: VNET Network CIDR | `string` | `"10.90.0.0/16"` | no |
 | <a name="input_deploymentType"></a> [deploymentType](#input\_deploymentType) | REQUIRED: This determines the type of deployment; one tier versus three tier: one\_tier, three\_tier | `string` | `"three_tier"` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | REQUIRED: Default is set to Azure DNS. | `string` | `"168.63.129.16"` | no |
