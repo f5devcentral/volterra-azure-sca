@@ -67,11 +67,14 @@ variable "tenant_name" {
   default     = "mr-customer"
 }
 
-variable "namespace" {
-  type        = string
-  description = "REQUIRED:  This is your Volterra Namespace"
-  default     = "m-coleman"
-}
+variable "subnetMgmt" {}
+variable "subnetExternal" {}
+variable "subnetInternal" {}
+variable "availability_set" {}
+
+variable "namespace" {}
+
+variable "resource_group" {}
 
 # NETWORK
 variable "cidr" {

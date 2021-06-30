@@ -243,7 +243,7 @@ variable "product" {
 variable "bigip_version" {
   type        = string
   description = "REQUIRED: BIG-IP Version.  Note: verify available versions before using as images can change."
-  default     = "15.1.200000"
+  default     = "latest"
 }
 
 # BIGIP Setup

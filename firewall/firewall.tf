@@ -3,15 +3,15 @@
 resource "random_id" "randomId" {
   keepers = {
     # Generate a new ID only when a new resource group is defined
-    resource_group = azurerm_resource_group.main.name
+    resource_group = var.resource_group.name
   }
   byte_length = 8
 }
 
 resource "azurerm_storage_account" "bigip_storageaccount" {
   name                     = "diag${random_id.randomId.hex}"
-  resource_group_name      = azurerm_resource_group.main.name
-  location                 = azurerm_resource_group.main.location
+  resource_group_name      = var.resource_group.name
+  location                 = var.resource_group.location
   account_replication_type = "LRS"
   account_tier             = "Standard"
 
@@ -19,141 +19,141 @@ resource "azurerm_storage_account" "bigip_storageaccount" {
 }
 
 
-# Create the first network interface card for Management
-# resource "azurerm_network_interface" "vm01-mgmt-nic" {
-#   name                = "${var.projectPrefix}-vm01-mgmt-nic"
-#   location            = azurerm_resource_group.main.location
-#   resource_group_name = azurerm_resource_group.main.name
+#Create the first network interface card for Management
+resource "azurerm_network_interface" "vm01-mgmt-nic" {
+  name                = "${var.projectPrefix}-vm01-mgmt-nic"
+  location            = var.resource_group.location
+  resource_group_name = var.resource_group.name
 
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = var.subnetMgmt.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.f5_mgmt["f5vm01mgmt"]
-#   }
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = var.subnetMgmt.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_mgmt["f5vm01mgmt"]
+  }
 
-#   tags = var.tags
-# }
+  tags = var.tags
+}
 
-# # Create the second network interface card for External
-# resource "azurerm_network_interface" "vm01-ext-nic" {
-#   name                          = "${var.projectPrefix}-vm01-ext-nic"
-#   location                      = var.resourceGroup.location
-#   resource_group_name           = var.resourceGroup.name
-#   enable_ip_forwarding          = true
-#   enable_accelerated_networking = var.bigip_version == "latest" ? true : false
+# Create the second network interface card for External
+resource "azurerm_network_interface" "vm01-ext-nic" {
+  name                          = "${var.projectPrefix}-vm01-ext-nic"
+  location                      = var.resource_group.location
+  resource_group_name           = var.resource_group.name
+  enable_ip_forwarding          = true
+  enable_accelerated_networking = var.bigip_version == "latest" ? true : false
 
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = var.subnetExternal.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.f5_t1_ext["f5vm01ext"]
-#     primary                       = true
-#   }
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = var.subnetExternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_ext["f5vm01ext"]
+    primary                       = true
+  }
 
-#   ip_configuration {
-#     name                          = "secondary"
-#     subnet_id                     = var.subnetExternal.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.f5_t1_ext["f5vm01ext_sec"]
-#   }
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = var.subnetExternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_ext["f5vm01ext_sec"]
+  }
 
-#   tags = {
-#     Name                      = "${var.projectPrefix}-vm01-ext-int"
-#     environment               = var.tags["environment"]
-#     owner                     = var.tags["owner"]
-#     group                     = var.tags["group"]
-#     costcenter                = var.tags["costcenter"]
-#     application               = var.tags["application"]
-#     f5_cloud_failover_label   = "saca"
-#     f5_cloud_failover_nic_map = "external"
-#   }
-# }
+  tags = {
+    Name                      = "${var.projectPrefix}-vm01-ext-int"
+    environment               = var.tags["environment"]
+    owner                     = var.tags["owner"]
+    group                     = var.tags["group"]
+    costcenter                = var.tags["costcenter"]
+    application               = var.tags["application"]
+    f5_cloud_failover_label   = "saca"
+    f5_cloud_failover_nic_map = "external"
+  }
+}
 
-# # Create the third network interface card for Internal
-# resource "azurerm_network_interface" "vm01-int-nic" {
-#   name                          = "${var.projectPrefix}-vm01-int-nic"
-#   location                      = var.resourceGroup.location
-#   resource_group_name           = var.resourceGroup.name
-#   enable_ip_forwarding          = true
-#   enable_accelerated_networking = var.bigip_version == "latest" ? true : false
+# Create the third network interface card for Internal
+resource "azurerm_network_interface" "vm01-int-nic" {
+  name                          = "${var.projectPrefix}-vm01-int-nic"
+  location                      = var.resource_group.location
+  resource_group_name           = var.resource_group.name
+  enable_ip_forwarding          = true
+  enable_accelerated_networking = var.bigip_version == "latest" ? true : false
 
-#   ip_configuration {
-#     name                          = "primary"
-#     subnet_id                     = var.subnetInternal.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.f5_t1_int["f5vm01int"]
-#     primary                       = true
-#   }
+  ip_configuration {
+    name                          = "primary"
+    subnet_id                     = var.subnetInternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_int["f5vm01int"]
+    primary                       = true
+  }
 
-#   ip_configuration {
-#     name                          = "secondary"
-#     subnet_id                     = var.subnetInternal.id
-#     private_ip_address_allocation = "Static"
-#     private_ip_address            = var.f5_t1_int["f5vm01int_sec"]
-#   }
+  ip_configuration {
+    name                          = "secondary"
+    subnet_id                     = var.subnetInternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_int["f5vm01int_sec"]
+  }
 
-#   tags = var.tags
-# }
+  tags = var.tags
+}
 
-# # Obtain Gateway IP for each Subnet
-# locals {
-#   depends_on = [var.subnetMgmt.id, var.subnetExternal.id]
-#   mgmt_gw    = cidrhost(var.subnetMgmt.address_prefix, 1)
-#   ext_gw     = cidrhost(var.subnetExternal.address_prefix, 1)
-#   int_gw     = cidrhost(var.subnetInternal.address_prefix, 1)
-# }
+# Obtain Gateway IP for each Subnet
+locals {
+  depends_on = [var.subnetMgmt.id, var.subnetExternal.id]
+  mgmt_gw    = cidrhost(var.subnetMgmt.address_prefix, 1)
+  ext_gw     = cidrhost(var.subnetExternal.address_prefix, 1)
+  int_gw     = cidrhost(var.subnetInternal.address_prefix, 1)
+}
 
-# # Create F5 BIGIP VMs
-# resource "azurerm_virtual_machine" "f5vm01" {
-#   name                         = "${var.projectPrefix}-f5vm01"
-#   location                     = var.resourceGroup.location
-#   resource_group_name          = var.resourceGroup.name
-#   primary_network_interface_id = azurerm_network_interface.vm01-mgmt-nic.id
-#   network_interface_ids        = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
-#   vm_size                      = var.instanceType
-#   availability_set_id          = var.availabilitySet.id
+# Create F5 BIGIP VMs
+resource "azurerm_virtual_machine" "f5vm01" {
+  name                         = "${var.projectPrefix}-f5vm01"
+  location                     = var.resource_group.location
+  resource_group_name          = var.resource_group.name
+  primary_network_interface_id = azurerm_network_interface.vm01-mgmt-nic.id
+  network_interface_ids        = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
+  vm_size                      = var.instanceType
+  availability_set_id          = var.availability_set.id
 
-#   delete_os_disk_on_termination    = true
-#   delete_data_disks_on_termination = true
+  delete_os_disk_on_termination    = true
+  delete_data_disks_on_termination = true
 
-#   storage_image_reference {
-#     publisher = "f5-networks"
-#     offer     = var.product
-#     sku       = var.image_name
-#     version   = var.bigip_version
-#   }
+  storage_image_reference {
+    publisher = "f5-networks"
+    offer     = var.product
+    sku       = var.image_name
+    version   = var.bigip_version
+  }
 
-#   storage_os_disk {
-#     name              = "${var.projectPrefix}vm01-osdisk"
-#     caching           = "ReadWrite"
-#     create_option     = "FromImage"
-#     managed_disk_type = "Standard_LRS"
-#   }
+  storage_os_disk {
+    name              = "${var.projectPrefix}vm01-osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
 
-#   os_profile {
-#     computer_name  = "${var.projectPrefix}vm01"
-#     admin_username = var.adminUserName
-#     admin_password = var.adminPassword
-#   }
+  os_profile {
+    computer_name  = "${var.projectPrefix}vm01"
+    admin_username = var.adminUserName
+    admin_password = var.adminPassword
+  }
 
-#   os_profile_linux_config {
-#     disable_password_authentication = false
-#   }
+  os_profile_linux_config {
+    disable_password_authentication = false
+  }
 
-#   boot_diagnostics {
-#     enabled     = true
-#     storage_uri = azurerm_storage_account.bigip_storageaccount.primary_blob_endpoint
-#   }
+  boot_diagnostics {
+    enabled     = true
+    storage_uri = azurerm_storage_account.bigip_storageaccount.primary_blob_endpoint
+  }
 
-#   plan {
-#     name      = var.image_name
-#     publisher = "f5-networks"
-#     product   = var.product
-#   }
+  plan {
+    name      = var.image_name
+    publisher = "f5-networks"
+    product   = var.product
+  }
 
-#   tags = var.tags
-# }
+  tags = var.tags
+}
 
 # # Setup Onboarding scripts
 # data "template_file" "vm_onboard" {
