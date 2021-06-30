@@ -6,6 +6,7 @@ provider "registry.terraform.io/volterraedge/volterra" {
   constraints = "0.7.0"
   hashes = [
     "h1:5V1/J/HUvWuzIGZgm6KtruMN3lYq1Ulry5PHm2zdEhA=",
+    "h1:krRcJ31sEdhxej12G//vP1LaoqO5w+CaNwTwDBJ6ZLE=",
     "zh:1626350ca639a43d759efad4332bdcc715c64c32137eacda08478ef70547f2b8",
     "zh:3a3eebe8d806df175308533186fc8c4ab83c94b45dd4ea8e8c79ef2714c7e811",
     "zh:62cec3f40bbce024cd44e62c8433aa91002007de7f0b3773eb89297bb4cda0bd",

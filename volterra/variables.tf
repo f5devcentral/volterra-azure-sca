@@ -39,21 +39,38 @@ variable "sshPublicKeyPath" {
   description = "OPTIONAL: ssh public key path for instances"
   default     = "~/.ssh/id_rsa.pub"
 }
-variable "api_p12_file" { default = "" }
 
-variable "api_cert" { default = "./creds/api2.cer" }
-variable "api_key" { default = "./creds/api.key" }
+variable "namespace" {
+  default = "default"
+}
+// required variable
+variable "api_p12_file" {}
 
-variable "tenant_name" { default = "" }
+// required variable
+variable "name" {}
 
-variable "namespace" { default = "" }
+// required variable
+variable "url" {}
 
-variable "url" { default = "" }
+// required variable
+variable "azure_client_id" {}
 
-variable "azure_client_id" { default = "" }
-variable "azure_client_secret" { default = "" }
-variable "azure_tenant_id" { default = "" }
-variable "azure_subscription_id" { default = "" }
+// required variable
+variable "azure_client_secret" {}
+
+// required variable
+variable "azure_tenant_id" {}
+
+// required variable
+variable "azure_subscription_id" {}
+
+variable "resource_group_name" {
+  default = "resource-group"
+}
+
+variable "volterra_tf_action" {
+  default = "plan"
+}
 
 variable "gateway_type" { default = "INGRESS_EGRESS_GATEWAY" }
 variable "fleet_label" { default = "fleet_label" }

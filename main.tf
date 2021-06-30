@@ -1,13 +1,10 @@
 module "volterra" {
   source = "./volterra"
-
-  tenant_name           = var.tenant_name
+  name                  = var.name
   namespace             = var.namespace
   fleet_label           = var.fleet_label
   url                   = var.api_url
   api_p12_file          = var.api_p12_file
-  api_cert              = var.api_p12_file != "" ? "" : var.api_cert
-  api_key               = var.api_p12_file != "" ? "" : var.api_key
   region                = var.region
   location              = var.location
   projectPrefix         = var.projectPrefix
