@@ -14,9 +14,7 @@ Volterra version of SCA/SCCA/SACA
 
 <!--TOC-->
 
-Volterra deploys Azure VNET site and some Azure bits.
-
-BIG-IP does not deploy yet.
+- Note BIG-IP is not configured.
 
 ![Rough Diagram](/images/sce.png)
 
