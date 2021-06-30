@@ -3,14 +3,14 @@ default_language_version:
   python: python3.8
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.48.0
+    rev: v1.50.0
     hooks:
       - id: terraform_fmt
       - id: terraform_tflint
       - id: terraform_docs
-        #args: ['--args=--required=false', '--args=--sort=false']
+        args: ['--args=--required=false', '--args=--sort=false']
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: check-executables-have-shebangs
       - id: check-case-conflict
@@ -23,7 +23,7 @@ repos:
       #- id: check-json
       - id: trailing-whitespace
   - repo: https://github.com/frnmst/md-toc
-    rev: 7.1.0
+    rev: 8.0.0
     hooks:
       - id: md-toc
   - repo: https://github.com/thoughtworks/talisman
