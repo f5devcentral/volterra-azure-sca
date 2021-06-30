@@ -11,7 +11,8 @@ BIG-IP does not deploy yet.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12 |
-| <a name="requirement_volterra"></a> [volterra](#requirement\_volterra) | 0.7.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~> 2.30.0 |
+| <a name="requirement_volterrarm"></a> [volterrarm](#requirement\_volterrarm) | 0.7.0 |
 
 ## Providers
 
@@ -21,6 +22,7 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
+| <a name="module_azure"></a> [azure](#module\_azure) | ./azure | n/a |
 | <a name="module_volterra"></a> [volterra](#module\_volterra) | ./volterra | n/a |
 
 ## Resources
@@ -49,7 +51,7 @@ No resources.
 | <a name="input_cidr"></a> [cidr](#input\_cidr) | REQUIRED: VNET Network CIDR | `string` | `"10.90.0.0/16"` | no |
 | <a name="input_deploymentType"></a> [deploymentType](#input\_deploymentType) | REQUIRED: This determines the type of deployment; one tier versus three tier: one\_tier, three\_tier | `string` | `"three_tier"` | no |
 | <a name="input_dns_server"></a> [dns\_server](#input\_dns\_server) | REQUIRED: Default is set to Azure DNS. | `string` | `"168.63.129.16"` | no |
-| <a name="input_f5_mgmt"></a> [f5\_mgmt](#input\_f5\_mgmt) | F5 BIG-IP Management IPs.  These must be in the management subnet. | `map(string)` | <pre>{<br>  "f5vm01mgmt": "10.90.0.4",<br>  "f5vm02mgmt": "10.90.0.5",<br>  "f5vm03mgmt": "10.90.0.6",<br>  "f5vm04mgmt": "10.90.0.7"<br>}</pre> | no |
+| <a name="input_f5_mgmt"></a> [f5\_mgmt](#input\_f5\_mgmt) | F5 BIG-IP Management IPs.  These must be in the management subnet. | `map(string)` | <pre>{<br>  "f5vm01mgmt": "10.90.0.4",<br>  "f5vm02mgmt": "10.90.0.5"<br>}</pre> | no |
 | <a name="input_f5_t1_ext"></a> [f5\_t1\_ext](#input\_f5\_t1\_ext) | Tier 1 BIG-IP External IPs.  These must be in the external subnet. | `map(string)` | <pre>{<br>  "f5vm01ext": "10.90.1.4",<br>  "f5vm01ext_sec": "10.90.1.11",<br>  "f5vm02ext": "10.90.1.5",<br>  "f5vm02ext_sec": "10.90.1.12"<br>}</pre> | no |
 | <a name="input_f5_t1_int"></a> [f5\_t1\_int](#input\_f5\_t1\_int) | Tier 1 BIG-IP Internal IPs.  These must be in the internal subnet. | `map(string)` | <pre>{<br>  "f5vm01int": "10.90.2.4",<br>  "f5vm01int_sec": "10.90.2.11",<br>  "f5vm02int": "10.90.2.5",<br>  "f5vm02int_sec": "10.90.2.12"<br>}</pre> | no |
 | <a name="input_f5_t3_ext"></a> [f5\_t3\_ext](#input\_f5\_t3\_ext) | Tier 3 BIG-IP External IPs.  These must be in the waf external subnet. | `map(string)` | <pre>{<br>  "f5vm03ext": "10.90.6.4",<br>  "f5vm03ext_sec": "10.90.6.11",<br>  "f5vm04ext": "10.90.6.5",<br>  "f5vm04ext_sec": "10.90.6.12"<br>}</pre> | no |
@@ -71,6 +73,7 @@ No resources.
 | <a name="input_licenses"></a> [licenses](#input\_licenses) | BIGIP Setup Licenses are only needed when using BYOL images | `map(string)` | <pre>{<br>  "license1": "",<br>  "license2": "",<br>  "license3": "",<br>  "license4": ""<br>}</pre> | no |
 | <a name="input_linuxjumpip"></a> [linuxjumpip](#input\_linuxjumpip) | REQUIRED: Used by all use-cases for SSH/Linux Jumpbox, must reside in VDMS subnet. | `string` | `"10.90.3.99"` | no |
 | <a name="input_location"></a> [location](#input\_location) | REQUIRED: Azure Region: usgovvirginia, usgovarizona, etc. For a list of available locations for your subscription use `az account list-locations -o table` | `string` | `"canadacentral"` | no |
+| <a name="input_name"></a> [name](#input\_name) | REQUIRED:  This is name for your deployment | `string` | `"m-coleman"` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | REQUIRED:  This is your Volterra Namespace | `string` | `"m-coleman"` | no |
 | <a name="input_ntp_server"></a> [ntp\_server](#input\_ntp\_server) | n/a | `string` | `"time.nist.gov"` | no |
 | <a name="input_onboard_log"></a> [onboard\_log](#input\_onboard\_log) | n/a | `string` | `"/var/log/startup-script.log"` | no |
@@ -82,12 +85,14 @@ No resources.
 | <a name="input_tags"></a> [tags](#input\_tags) | Environment tags for objects | `map(string)` | <pre>{<br>  "application": "f5app",<br>  "costcenter": "f5costcenter",<br>  "environment": "f5env",<br>  "group": "f5group",<br>  "owner": "f5owner",<br>  "purpose": "public"<br>}</pre> | no |
 | <a name="input_tenant_name"></a> [tenant\_name](#input\_tenant\_name) | REQUIRED:  This is your Volterra Tenant Name:  https://<tenant\_name>.console.ves.volterra.io/api | `string` | `"f5-sa"` | no |
 | <a name="input_timezone"></a> [timezone](#input\_timezone) | n/a | `string` | `"UTC"` | no |
+| <a name="input_volterra_tf_action"></a> [volterra\_tf\_action](#input\_volterra\_tf\_action) | n/a | `string` | `"apply"` | no |
 | <a name="input_winjumpip"></a> [winjumpip](#input\_winjumpip) | REQUIRED: Used by all use-cases for RDP/Windows Jumpbox, must reside in VDMS subnet. | `string` | `"10.90.3.98"` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_volterra_cloud_credential"></a> [volterra\_cloud\_credential](#output\_volterra\_cloud\_credential) | n/a |
 | <a name="output_volterra_site_token"></a> [volterra\_site\_token](#output\_volterra\_site\_token) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
