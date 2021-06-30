@@ -8,10 +8,10 @@ terraform {
   }
 }
 
-provider "volterra" {
-  api_p12_file = var.api_p12_file
-  url          = var.url
-}
+# provider "volterra" {
+#   api_p12_file = var.api_p12_file
+#   url          = var.url
+# }
 
 resource "volterra_token" "new_site" {
   name      = format("%s-sca-token", var.name)
@@ -38,11 +38,17 @@ resource "volterra_cloud_credentials" "azure_site" {
   }
 }
 
+output "credentials" {
+  value = volterra_cloud_credentials.azure_site.name
+}
+
 resource "volterra_azure_vnet_site" "azure_site" {
   name         = format("%s-vnet-site", var.name)
   namespace    = "system"
   azure_region = var.location
-  ssh_key      = file(var.sshPublicKeyPath)
+  #resource_group = var.resource_group_name
+  resource_group = "${var.projectPrefix}_volt_rg"
+  ssh_key        = file(var.sshPublicKeyPath)
 
   machine_type = "Standard_D3_v2"
 
@@ -61,9 +67,6 @@ resource "volterra_azure_vnet_site" "azure_site" {
 
   // One of the arguments from this list "logs_streaming_disabled log_receiver" must be set
   logs_streaming_disabled = true
-  resource_group          = var.resource_group_name
-
-  // One of the arguments from this list "ingress_egress_gw voltstack_cluster ingress_gw" must be set
 
   ingress_egress_gw {
     azure_certified_hw = "azure-byol-multi-nic-voltmesh"
@@ -78,22 +81,39 @@ resource "volterra_azure_vnet_site" "azure_site" {
       azure_az = "1"
 
       inside_subnet {
-        subnet_param {
-          ipv4 = "10.1.1.0/24"
+        subnet {
+          subnet_resource_grp = var.resource_group_name
+          vnet_resource_group = true
+          subnet_name         = "internal"
         }
+        # subnet_param {
+        #   #ipv4 = "10.1.1.0/24"
+        #   ipv4 = var.azure_subnets["internal"]
+        # }
       }
       outside_subnet {
-        subnet_param {
-          ipv4 = "10.1.0.0/24"
+        subnet {
+          subnet_resource_grp = var.resource_group_name
+          vnet_resource_group = true
+          subnet_name         = "external"
         }
+        # subnet_param {
+        #   #ipv4 = "10.1.0.0/24"
+        #   ipv4 = var.azure_subnets["external"]
+        # }
       }
     }
 
   }
   vnet {
-    new_vnet {
-      autogenerate = true
-      primary_ipv4 = "10.1.0.0/16"
+    # new_vnet {
+    #   autogenerate = true
+    #   #primary_ipv4 = "10.1.0.0/16"
+    #   primary_ipv4 = var.cidr
+    # }
+    existing_vnet {
+      resource_group = var.resource_group_name
+      vnet_name      = var.existing_vnet.name
     }
   }
 }

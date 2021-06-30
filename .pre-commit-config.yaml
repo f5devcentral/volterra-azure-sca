@@ -8,7 +8,7 @@ repos:
       - id: terraform_fmt
       - id: terraform_tflint
       - id: terraform_docs
-        args: ['--args=--required=false', '--args=--sort=false']
+        #args: ['--args=--required=false', '--args=--sort=false']
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
     hooks:
@@ -27,6 +27,6 @@ repos:
     hooks:
       - id: md-toc
   - repo: https://github.com/thoughtworks/talisman
-    rev: v1.11.0
+    rev: v1.20.0
     hooks:
       - id: talisman-commit

@@ -1,7 +1,23 @@
+# main.tf
+
+module "azure" {
+  source        = "./azure"
+  location      = var.location
+  projectPrefix = var.projectPrefix
+  cidr          = var.cidr
+  subnets       = var.azure_subnets
+}
+
 module "volterra" {
   source = "./volterra"
-  name                  = var.name
-  namespace             = var.namespace
+
+  depends_on = [
+    module.azure.azure_resource_group_main, module.azure.azure_virtual_network_main, module.azure.azure_subnet_internal, module.azure.azure_subnet_external
+  ]
+  name      = var.name
+  namespace = var.namespace
+  #resource_group_name   = "${var.projectPrefix}_rg"
+  resource_group_name   = module.azure.azure_resource_group_main.name
   fleet_label           = var.fleet_label
   url                   = var.api_url
   api_p12_file          = var.api_p12_file
@@ -9,20 +25,19 @@ module "volterra" {
   location              = var.location
   projectPrefix         = var.projectPrefix
   sshPublicKeyPath      = var.sshPublicKeyPath
+  sshPublicKey          = var.sshPublicKey
   azure_client_id       = var.azure_client_id
   azure_client_secret   = var.azure_client_secret
   azure_tenant_id       = var.azure_tenant_id
   azure_subscription_id = var.azure_subscription_id
   gateway_type          = var.gateway_type
+  volterra_tf_action    = var.volterra_tf_action
+  existing_vnet         = module.azure.azure_virtual_network_main
+  cidr                  = var.cidr
+  azure_subnets         = var.azure_subnets
 }
 
-# module azure {
-#   source        = "./azure"
-#   location      = var.location
-#   projectPrefix = var.projectPrefix
-# }
-
-# module firewall {
+# module "firewall" {
 #   source        = "./firewall"
 #   sshPublicKey  = var.sshPublicKeyPath
 #   location      = var.location
@@ -34,7 +49,7 @@ module "volterra" {
 #   adminPassword = var.adminPassword
 #   projectPrefix = var.projectPrefix
 #   instanceType  = var.instanceType
-#   subnets       = var.subnets
+#   subnets       = var.azure_subnets
 #   cidr          = var.cidr
 #   app01ip       = var.app01ip
 #   hosts         = var.hosts

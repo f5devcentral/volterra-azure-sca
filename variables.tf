@@ -73,6 +73,9 @@ variable "name" {
   description = "REQUIRED:  This is name for your deployment"
   default     = "nebula"
 }
+variable "volterra_tf_action" {
+  default = "plan"
+}
 
 variable "api_url" {
   type        = string
@@ -116,8 +119,6 @@ variable "f5_mgmt" {
   default = {
     f5vm01mgmt = "10.90.0.4"
     f5vm02mgmt = "10.90.0.5"
-    f5vm03mgmt = "10.90.0.6"
-    f5vm04mgmt = "10.90.0.7"
   }
 }
 
