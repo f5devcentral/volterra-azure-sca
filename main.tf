@@ -38,37 +38,42 @@ module "volterra" {
 }
 
 module "firewall" {
-  source           = "./firewall"
-  sshPublicKey     = var.sshPublicKeyPath
-  location         = var.location
-  region           = var.region
-  resource_group   = module.azure.azure_resource_group_main
-  namespace        = var.namespace
-  subnetMgmt       = module.azure.azure_subnet_mgmt
-  subnetExternal   = module.azure.azure_subnet_external
-  subnetInternal   = module.azure.azure_subnet_internal
-  availability_set = module.azure.azure_availability_set_avset
-  image_name       = var.image_name
-  product          = var.product
-  bigip_version    = var.bigip_version
-  adminUserName    = var.adminUserName
-  adminPassword    = var.adminPassword
-  projectPrefix    = var.projectPrefix
-  instanceType     = var.instanceType
-  subnets          = var.azure_subnets
-  cidr             = var.cidr
-  app01ip          = var.app01ip
-  hosts            = var.hosts
-  f5_mgmt          = var.f5_mgmt
-  f5_t1_ext        = var.f5_t1_ext
-  f5_t1_int        = var.f5_t1_int
-  winjumpip        = var.winjumpip
-  linuxjumpip      = var.linuxjumpip
-  licenses         = var.licenses
-  ilb01ip          = var.ilb01ip
-  asm_policy       = var.asm_policy
-  tags             = var.tags
-  timezone         = var.timezone
-  ntp_server       = var.ntp_server
-  dns_server       = var.dns_server
+  source = "./firewall"
+  depends_on = [
+    module.azure.azure_resource_group_main, module.azure.azure_virtual_network_main, module.azure.azure_subnet_internal, module.azure.azure_subnet_external, module.azure.azure_key_vault_uri, module.azure.azure_key_vault_secret
+  ]
+  sshPublicKey           = var.sshPublicKeyPath
+  location               = var.location
+  region                 = var.region
+  resource_group         = module.azure.azure_resource_group_main
+  azure_key_vault_uri    = module.azure.azure_key_vault_uri
+  azure_key_vault_secret = module.azure.azure_key_vault_secret
+  namespace              = var.namespace
+  subnetMgmt             = module.azure.azure_subnet_mgmt
+  subnetExternal         = module.azure.azure_subnet_external
+  subnetInternal         = module.azure.azure_subnet_internal
+  availability_set       = module.azure.azure_availability_set_avset
+  image_name             = var.image_name
+  product                = var.product
+  bigip_version          = var.bigip_version
+  adminUserName          = var.adminUserName
+  adminPassword          = var.adminPassword
+  projectPrefix          = var.projectPrefix
+  instanceType           = var.instanceType
+  subnets                = var.azure_subnets
+  cidr                   = var.cidr
+  app01ip                = var.app01ip
+  hosts                  = var.hosts
+  f5_mgmt                = var.f5_mgmt
+  f5_t1_ext              = var.f5_t1_ext
+  f5_t1_int              = var.f5_t1_int
+  winjumpip              = var.winjumpip
+  linuxjumpip            = var.linuxjumpip
+  licenses               = var.licenses
+  ilb01ip                = var.ilb01ip
+  asm_policy             = var.asm_policy
+  tags                   = var.tags
+  timezone               = var.timezone
+  ntp_server             = var.ntp_server
+  dns_server             = var.dns_server
 }

@@ -104,6 +104,75 @@ locals {
   int_gw     = cidrhost(var.subnetInternal.address_prefix, 1)
 }
 
+# as3 uuid generation
+resource "random_uuid" "as3_uuid" {}
+
+data "http" "onboard" {
+  url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-DO/master/dist/terraform/latest/${var.licenses["license1"] != "" ? "byol" : "payg"}_standalone.json"
+}
+
+data "http" "appservice" {
+  url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-AS3/master/dist/terraform/latest/sccaSingleTier.json"
+}
+
+data "template_file" "vm01_do_json" {
+  template = data.http.onboard.body
+  vars = {
+    host1           = var.hosts["host1"]
+    host2           = var.hosts["host2"]
+    local_host      = var.hosts["host1"]
+    external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["external"]), 1)}"
+    internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
+    log_localip     = var.f5_t1_ext["f5vm01ext"]
+    log_destination = var.app01ip
+    vdmsSubnet      = var.subnets["vdms"]
+    appSubnet       = var.subnets["application"]
+    vnetSubnet      = var.cidr
+    remote_host     = var.hosts["host2"]
+    remote_selfip   = var.f5_t1_ext["f5vm02ext"]
+    externalGateway = local.ext_gw
+    internalGateway = local.int_gw
+    mgmtGateway     = local.mgmt_gw
+    dns_server      = var.dns_server
+    ntp_server      = var.ntp_server
+    timezone        = var.timezone
+    admin_user      = var.adminUserName
+    admin_password  = var.adminPassword
+    license         = var.licenses["license1"] != "" ? var.licenses["license1"] : ""
+  }
+}
+
+data "template_file" "as3_json" {
+  template = data.http.appservice.body
+  vars = {
+    uuid                = random_uuid.as3_uuid.result
+    baseline_waf_policy = var.asm_policy
+    exampleVipAddress   = var.f5_t1_ext["f5vm01ext"]
+    exampleVipSubnet    = var.subnets["external"]
+    rdp_pool_addresses  = var.winjumpip
+    ssh_pool_addresses  = var.linuxjumpip
+    app_pool_addresses  = var.app01ip
+    ips_pool_addresses  = var.app01ip
+    log_destination     = var.app01ip
+    example_vs_address  = var.subnets["external"]
+    mgmtVipAddress      = var.f5_t1_ext["f5vm01ext_sec"]
+    mgmtVipAddress2     = var.f5_t1_ext["f5vm02ext_sec"]
+    transitVipAddress   = var.f5_t1_int["f5vm01int_sec"]
+    transitVipAddress2  = var.f5_t1_int["f5vm02int_sec"]
+  }
+}
+
+
+data "template_file" "startup_script" {
+  template = file("${path.module}/../templates/startup_script.tpl")
+  vars = {
+    keyvault_uri         = var.azure_key_vault_uri
+    secret_id            = var.azure_key_vault_secret
+    declative_onboarding = data.template_file.vm01_do_json.rendered
+    application_services = data.template_file.as3_json.rendered
+  }
+}
+
 # Create F5 BIGIP VMs
 resource "azurerm_virtual_machine" "f5vm01" {
   name                         = "${var.projectPrefix}-f5vm01"
@@ -135,6 +204,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     computer_name  = "${var.projectPrefix}vm01"
     admin_username = var.adminUserName
     admin_password = var.adminPassword
+    custom_data    = data.template_file.startup_script.rendered
   }
 
   os_profile_linux_config {
@@ -155,104 +225,20 @@ resource "azurerm_virtual_machine" "f5vm01" {
   tags = var.tags
 }
 
-# # Setup Onboarding scripts
-# data "template_file" "vm_onboard" {
-#   template = file("./templates/onboard.tpl")
-#   vars = {
-#     uname                     = var.adminUserName
-#     upassword                 = var.adminPassword
-#     doVersion                 = "latest"
-#     as3Version                = "latest"
-#     tsVersion                 = "latest"
-#     cfVersion                 = "latest"
-#     fastVersion               = "1.0.0"
-#     doExternalDeclarationUrl  = "https://example.domain.com/do.json"
-#     as3ExternalDeclarationUrl = "https://example.domain.com/as3.json"
-#     tsExternalDeclarationUrl  = "https://example.domain.com/ts.json"
-#     cfExternalDeclarationUrl  = "https://example.domain.com/cf.json"
-#     onboard_log               = var.onboard_log
-#     mgmtGateway               = local.mgmt_gw
-#     DO1_Document              = data.template_file.vm01_do_json.rendered
-#     DO2_Document              = data.template_file.vm02_do_json.rendered
-#     AS3_Document              = data.template_file.as3_json.rendered
-#   }
-# }
+# Do runtime-init
 
-# # template ATC json
-
-# # as3 uuid generation
-# resource "random_uuid" "as3_uuid" {}
-
-# data "http" "onboard" {
-#   url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-DO/master/dist/terraform/latest/${var.licenses["license1"] != "" ? "byol" : "payg"}_cluster.json"
-# }
-
-# data "template_file" "vm01_do_json" {
-#   template = data.http.onboard.body
-#   vars = {
-#     host1           = var.hosts["host1"]
-#     host2           = var.hosts["host2"]
-#     local_host      = var.hosts["host1"]
-#     external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["external"]), 1)}"
-#     internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
-#     log_localip     = var.f5_t1_ext["f5vm01ext"]
-#     log_destination = var.app01ip
-#     vdmsSubnet      = var.subnets["vdms"]
-#     appSubnet       = var.subnets["application"]
-#     vnetSubnet      = var.cidr
-#     externalGateway = local.ext_gw
-#     internalGateway = local.int_gw
-#     mgmtGateway     = local.mgmt_gw
-#     dns_server      = var.dns_server
-#     ntp_server      = var.ntp_server
-#     timezone        = var.timezone
-#     admin_user      = var.adminUserName
-#     admin_password  = var.adminPassword
-#     license         = var.licenses["license1"] != "" ? var.licenses["license1"] : ""
-#   }
-# }
-
-# data "http" "appservice" {
-#   url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-AS3/master/dist/terraform/latest/sccaSingleTier.json"
-# }
-
-# data "template_file" "as3_json" {
-#   template = data.http.appservice.body
-#   vars = {
-#     uuid                = random_uuid.as3_uuid.result
-#     baseline_waf_policy = var.asm_policy
-#     exampleVipAddress   = var.f5_t1_ext["f5vm01ext"]
-#     exampleVipSubnet    = var.subnets["external"]
-#     rdp_pool_addresses  = var.winjumpip
-#     ssh_pool_addresses  = var.linuxjumpip
-#     app_pool_addresses  = var.app01ip
-#     ips_pool_addresses  = var.app01ip
-#     log_destination     = var.app01ip
-#     example_vs_address  = var.subnets["external"]
-#     mgmtVipAddress      = var.f5_t1_ext["f5vm01ext_sec"]
-#     transitVipAddress   = var.f5_t1_int["f5vm01int_sec"]
-#   }
-# }
-
-# # Run Startup Script
-# resource "azurerm_virtual_machine_extension" "f5vm01-run-startup-cmd" {
-#   name                       = "${var.projectPrefix}-f5vm01-run-startup-cmd"
-#   depends_on                 = [azurerm_virtual_machine.f5vm01, azurerm_network_interface_backend_address_pool_association.mpool_assc_vm01]
-#   virtual_machine_id         = azurerm_virtual_machine.f5vm01.id
-#   publisher                  = "Microsoft.Azure.Extensions"
-#   type                       = "CustomScript"
-#   type_handler_version       = "2.0"
-#   auto_upgrade_minor_version = true
-
-#   settings = <<SETTINGS
-#     {
-#         "skipDos2Unix": false,
-#         "commandToExecute": "echo '${base64encode(data.template_file.vm_onboard.rendered)}' >> ./startup.b64 && cat ./startup.b64 | base64 -d >> ./startup-temp.sh && sed -e 's/\r$//' ./startup-temp.sh > ./startup-script.sh && chmod +x ./startup-script.sh && rm ./startup.b64 && bash ./startup-script.sh 1"
-#     }
-#   SETTINGS
-
-#   tags = var.tags
-# }
+resource "azurerm_virtual_machine_extension" "run_startup_cmd" {
+  name                 = "${var.projectPrefix}-run-startup-cmd"
+  virtual_machine_id   = azurerm_virtual_machine.f5vm01.id
+  publisher            = "Microsoft.OSTCExtensions"
+  type                 = "CustomScriptForLinux"
+  type_handler_version = "1.2"
+  settings             = <<SETTINGS
+    {
+      "commandToExecute": "bash /var/lib/waagent/CustomData"
+    }
+SETTINGS
+}
 
 # # Debug Template Outputs
 # resource "local_file" "vm01_do_file" {
