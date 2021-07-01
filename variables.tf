@@ -2,7 +2,7 @@
 variable "projectPrefix" {
   type        = string
   description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
-  default     = "dcbad9f1"
+  default     = "ecbad9f1"
 }
 variable "adminUserName" {
   type        = string
@@ -117,8 +117,8 @@ variable "f5_mgmt" {
   description = "F5 BIG-IP Management IPs.  These must be in the management subnet."
   type        = map(string)
   default = {
-    f5vm01mgmt = "10.90.0.4"
-    f5vm02mgmt = "10.90.0.5"
+    f5vm01mgmt = "10.90.0.14"
+    f5vm02mgmt = "10.90.0.15"
   }
 }
 
@@ -127,9 +127,9 @@ variable "f5_t1_ext" {
   description = "Tier 1 BIG-IP External IPs.  These must be in the external subnet."
   type        = map(string)
   default = {
-    f5vm01ext     = "10.90.1.4"
+    f5vm01ext     = "10.90.1.14"
     f5vm01ext_sec = "10.90.1.11"
-    f5vm02ext     = "10.90.1.5"
+    f5vm02ext     = "10.90.1.15"
     f5vm02ext_sec = "10.90.1.12"
   }
 }
@@ -138,9 +138,9 @@ variable "f5_t1_int" {
   description = "Tier 1 BIG-IP Internal IPs.  These must be in the internal subnet."
   type        = map(string)
   default = {
-    f5vm01int     = "10.90.2.4"
+    f5vm01int     = "10.90.2.14"
     f5vm01int_sec = "10.90.2.11"
-    f5vm02int     = "10.90.2.5"
+    f5vm02int     = "10.90.2.15"
     f5vm02int_sec = "10.90.2.12"
   }
 }

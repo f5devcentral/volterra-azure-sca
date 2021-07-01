@@ -1,9 +1,51 @@
 # azure.tf
 
+
+data "azurerm_client_config" "current" {}
+
+
 # Create a Resource Group for the new Virtual Machines
 resource "azurerm_resource_group" "main" {
   name     = "${var.projectPrefix}_rg"
   location = var.location
+}
+
+# Create KeyVault so Vinnie doesnt yell at me
+resource "azurerm_key_vault" "keyvault" {
+  name                        = "${var.projectPrefix}-vault"
+  location                    = azurerm_resource_group.main.location
+  resource_group_name         = azurerm_resource_group.main.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "create",
+      "get",
+    ]
+
+    secret_permissions = [
+      "set",
+      "get",
+      "delete",
+      "purge",
+      "recover"
+    ]
+  }
+}
+
+# Create a Secret in Vault
+resource "azurerm_key_vault_secret" "secret" {
+  name         = "szechuan"
+  value        = var.adminPassword
+  key_vault_id = azurerm_key_vault.keyvault.id
 }
 
 # Create Availability Set
@@ -57,6 +99,8 @@ locals {
 }
 
 # outputs
+output "azure_key_vault_uri" { value = azurerm_key_vault.keyvault.vault_uri }
+output "azure_key_vault_secret" { value = azurerm_key_vault_secret.secret.id }
 output "azure_resource_group_main" { value = azurerm_resource_group.main }
 output "azure_availability_set_avset" { value = azurerm_availability_set.avset }
 output "azure_virtual_network_main" { value = azurerm_virtual_network.main }

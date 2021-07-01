@@ -76,6 +76,9 @@ variable "namespace" {}
 
 variable "resource_group" {}
 
+variable "azure_key_vault_uri" {}
+variable "azure_key_vault_secret" {}
+
 # NETWORK
 variable "cidr" {
   description = "REQUIRED: VNET Network CIDR"
