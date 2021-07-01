@@ -1,8 +1,6 @@
 # azure.tf
 
-
 data "azurerm_client_config" "current" {}
-
 
 # Create a Resource Group for the new Virtual Machines
 resource "azurerm_resource_group" "main" {
@@ -12,13 +10,15 @@ resource "azurerm_resource_group" "main" {
 
 # Create KeyVault so Vinnie doesnt yell at me
 resource "azurerm_key_vault" "keyvault" {
-  name                        = "${var.projectPrefix}-vault"
-  location                    = azurerm_resource_group.main.location
-  resource_group_name         = azurerm_resource_group.main.name
-  enabled_for_disk_encryption = true
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  soft_delete_retention_days  = 7
-  purge_protection_enabled    = false
+  name                            = "${var.projectPrefix}-vault"
+  location                        = azurerm_resource_group.main.location
+  resource_group_name             = azurerm_resource_group.main.name
+  enabled_for_disk_encryption     = true
+  enabled_for_deployment          = true
+  enabled_for_template_deployment = true
+  tenant_id                       = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days      = 7
+  purge_protection_enabled        = false
 
   sku_name = "standard"
 
@@ -32,6 +32,7 @@ resource "azurerm_key_vault" "keyvault" {
     ]
 
     secret_permissions = [
+      "list",
       "set",
       "get",
       "delete",
@@ -90,6 +91,21 @@ resource "azurerm_subnet" "internal" {
   address_prefixes     = [var.subnets["internal"]]
 }
 
+# Create the external IPS subnet within the Vnet
+resource "azurerm_subnet" "inspect_external" {
+  name                 = "inspect_external"
+  virtual_network_name = azurerm_virtual_network.main.name
+  resource_group_name  = azurerm_resource_group.main.name
+  address_prefixes     = [var.subnets["inspect_ext"]]
+}
+# Create the internal IPS subnet within the Vnet
+resource "azurerm_subnet" "inspect_internal" {
+  name                 = "inspect_internal"
+  virtual_network_name = azurerm_virtual_network.main.name
+  resource_group_name  = azurerm_resource_group.main.name
+  address_prefixes     = [var.subnets["inspect_int"]]
+}
+
 # Obtain Gateway IP for each Subnet
 locals {
   depends_on = [azurerm_subnet.mgmt, azurerm_subnet.external]
@@ -107,3 +123,5 @@ output "azure_virtual_network_main" { value = azurerm_virtual_network.main }
 output "azure_subnet_mgmt" { value = azurerm_subnet.mgmt }
 output "azure_subnet_external" { value = azurerm_subnet.external }
 output "azure_subnet_internal" { value = azurerm_subnet.internal }
+output "azure_subnet_inspec_int" { value = azurerm_subnet.inspect_internal }
+output "azure_subnet_inspec_ext" { value = azurerm_subnet.inspect_external }

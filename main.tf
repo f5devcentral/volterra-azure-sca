@@ -35,6 +35,8 @@ module "volterra" {
   existing_vnet         = module.azure.azure_virtual_network_main
   cidr                  = var.cidr
   azure_subnets         = var.azure_subnets
+  subnet_internal       = module.azure.azure_subnet_internal
+  subnet_external       = module.azure.azure_subnet_external
 }
 
 module "firewall" {
@@ -48,10 +50,11 @@ module "firewall" {
   resource_group         = module.azure.azure_resource_group_main
   azure_key_vault_uri    = module.azure.azure_key_vault_uri
   azure_key_vault_secret = module.azure.azure_key_vault_secret
+  security_group         = module.azure.azurerm_network_security_group_main
   namespace              = var.namespace
   subnetMgmt             = module.azure.azure_subnet_mgmt
-  subnetExternal         = module.azure.azure_subnet_external
-  subnetInternal         = module.azure.azure_subnet_internal
+  subnetExternal         = module.azure.azure_subnet_inspec_ext
+  subnetInternal         = module.azure.azure_subnet_inspec_int
   availability_set       = module.azure.azure_availability_set_avset
   image_name             = var.image_name
   product                = var.product
@@ -70,7 +73,6 @@ module "firewall" {
   winjumpip              = var.winjumpip
   linuxjumpip            = var.linuxjumpip
   licenses               = var.licenses
-  ilb01ip                = var.ilb01ip
   asm_policy             = var.asm_policy
   tags                   = var.tags
   timezone               = var.timezone

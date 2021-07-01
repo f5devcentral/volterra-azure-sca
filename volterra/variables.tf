@@ -34,6 +34,9 @@ variable "resource_group_name" {}
 
 variable "volterra_tf_action" {}
 
+variable "subnet_internal" {}
+variable "subnet_external" {}
+
 variable "gateway_type" { default = "INGRESS_EGRESS_GATEWAY" }
 variable "fleet_label" { default = "fleet_label" }
 

@@ -71,6 +71,7 @@ variable "subnetMgmt" {}
 variable "subnetExternal" {}
 variable "subnetInternal" {}
 variable "availability_set" {}
+variable "security_group" {}
 
 variable "namespace" {}
 

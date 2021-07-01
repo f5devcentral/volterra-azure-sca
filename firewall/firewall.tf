@@ -48,6 +48,11 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   tags = var.tags
 }
 
+resource "azurerm_network_interface_security_group_association" "bigip01-mgmt-nsg" {
+  network_interface_id      = azurerm_network_interface.vm01-mgmt-nic.id
+  network_security_group_id = var.security_group.id
+}
+
 # Create the second network interface card for External
 resource "azurerm_network_interface" "vm01-ext-nic" {
   name                          = "${var.projectPrefix}-vm01-ext-nic"
@@ -138,7 +143,6 @@ data "template_file" "vm01_do_json" {
     internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
     log_localip     = var.f5_t1_ext["f5vm01ext"]
     log_destination = var.app01ip
-    vdmsSubnet      = var.subnets["vdms"]
     appSubnet       = var.subnets["application"]
     vnetSubnet      = var.cidr
     remote_host     = var.hosts["host2"]
@@ -177,13 +181,12 @@ data "template_file" "as3_json" {
 
 
 data "template_file" "startup_script" {
-  template = file("${path.module}/../templates/startup_script.tpl")
-  vars = {
+  template = templatefile("${path.module}/../templates/startup_script.tpl", {
     keyvault_uri         = var.azure_key_vault_uri
     secret_id            = var.azure_key_vault_secret
     declative_onboarding = data.template_file.vm01_do_json.rendered
     application_services = data.template_file.as3_json.rendered
-  }
+  })
 }
 
 # Create F5 BIGIP VMs
@@ -217,7 +220,7 @@ resource "azurerm_virtual_machine" "f5vm01" {
     computer_name  = "${var.projectPrefix}vm01"
     admin_username = var.adminUserName
     admin_password = var.adminPassword
-    custom_data    = data.template_file.startup_script.rendered
+    custom_data    = base64encode(data.template_file.startup_script.rendered)
   }
 
   os_profile_linux_config {
@@ -265,5 +268,9 @@ resource "azurerm_virtual_machine" "f5vm01" {
 
 resource "local_file" "onboard_file" {
   content  = data.template_file.startup_script.rendered
-  filename = "${path.module}/startup.sh"
+  filename = "${path.module}/startup-init.sh"
+}
+
+output "azurerm_public_ip_pip" {
+  value = azurerm_public_ip.f5vmpip01.ip_address
 }

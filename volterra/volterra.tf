@@ -8,11 +8,6 @@ terraform {
   }
 }
 
-# provider "volterra" {
-#   api_p12_file = var.api_p12_file
-#   url          = var.url
-# }
-
 resource "volterra_token" "new_site" {
   name      = format("%s-sca-token", var.name)
   namespace = "system"
@@ -43,8 +38,13 @@ output "credentials" {
 }
 
 resource "volterra_azure_vnet_site" "azure_site" {
-  name         = format("%s-vnet-site", var.name)
-  namespace    = "system"
+  name      = format("%s-vnet-site", var.name)
+  namespace = "system"
+
+  depends_on = [
+    var.subnet_internal, var.subnet_external
+  ]
+
   azure_region = var.location
   #resource_group = var.resource_group_name
   resource_group = "${var.projectPrefix}_volt_rg"
@@ -86,10 +86,6 @@ resource "volterra_azure_vnet_site" "azure_site" {
           vnet_resource_group = true
           subnet_name         = "internal"
         }
-        # subnet_param {
-        #   #ipv4 = "10.1.1.0/24"
-        #   ipv4 = var.azure_subnets["internal"]
-        # }
       }
       outside_subnet {
         subnet {
@@ -97,20 +93,12 @@ resource "volterra_azure_vnet_site" "azure_site" {
           vnet_resource_group = true
           subnet_name         = "external"
         }
-        # subnet_param {
-        #   #ipv4 = "10.1.0.0/24"
-        #   ipv4 = var.azure_subnets["external"]
-        # }
       }
     }
 
   }
   vnet {
-    # new_vnet {
-    #   autogenerate = true
-    #   #primary_ipv4 = "10.1.0.0/16"
-    #   primary_ipv4 = var.cidr
-    # }
+
     existing_vnet {
       resource_group = var.resource_group_name
       vnet_name      = var.existing_vnet.name
