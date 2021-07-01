@@ -18,6 +18,18 @@ resource "azurerm_storage_account" "bigip_storageaccount" {
   tags = var.tags
 }
 
+# Create a Public IP for the Virtual Machines
+resource "azurerm_public_ip" "f5vmpip01" {
+  name                = "${var.projectPrefix}-vm01-mgmt-pip01-delete-me"
+  location            = var.resource_group.location
+  resource_group_name = var.resource_group.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = {
+    Name = "${var.projectPrefix}-f5vm-public-ip-delete-me"
+  }
+}
 
 #Create the first network interface card for Management
 resource "azurerm_network_interface" "vm01-mgmt-nic" {
@@ -30,6 +42,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
     subnet_id                     = var.subnetMgmt.id
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5_mgmt["f5vm01mgmt"]
+    public_ip_address_id          = azurerm_public_ip.f5vmpip01.id
   }
 
   tags = var.tags
@@ -225,20 +238,19 @@ resource "azurerm_virtual_machine" "f5vm01" {
   tags = var.tags
 }
 
-# Do runtime-init
-
-resource "azurerm_virtual_machine_extension" "run_startup_cmd" {
-  name                 = "${var.projectPrefix}-run-startup-cmd"
-  virtual_machine_id   = azurerm_virtual_machine.f5vm01.id
-  publisher            = "Microsoft.OSTCExtensions"
-  type                 = "CustomScriptForLinux"
-  type_handler_version = "1.2"
-  settings             = <<SETTINGS
-    {
-      "commandToExecute": "bash /var/lib/waagent/CustomData"
-    }
-SETTINGS
-}
+# #Do runtime-init
+# resource "azurerm_virtual_machine_extension" "run_startup_cmd" {
+#   name                 = "${var.projectPrefix}-run-startup-cmd"
+#   virtual_machine_id   = azurerm_virtual_machine.f5vm01.id
+#   publisher            = "Microsoft.OSTCExtensions"
+#   type                 = "CustomScriptForLinux"
+#   type_handler_version = "1.2"
+#   settings             = <<SETTINGS
+#     {
+#       "commandToExecute": "bash /var/lib/waagent/CustomData"
+#     }
+# SETTINGS
+# }
 
 # # Debug Template Outputs
 # resource "local_file" "vm01_do_file" {
@@ -251,7 +263,7 @@ SETTINGS
 #   filename = "${path.module}/vm_as3_data.json"
 # }
 
-# resource "local_file" "onboard_file" {
-#   content  = data.template_file.vm_onboard.rendered
-#   filename = "${path.module}/onboard.sh"
-# }
+resource "local_file" "onboard_file" {
+  content  = data.template_file.startup_script.rendered
+  filename = "${path.module}/startup.sh"
+}

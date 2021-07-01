@@ -9,8 +9,8 @@ runtime_parameters:
     secretProvider:
       environment: azure
       type: KeyVault
-      vaultUrl: ${keyvault_uri}
-      secretId: ${secret_id}
+      vaultUrl: https://ecbad9f1-vault.vault.azure.net/
+      secretId: https://ecbad9f1-vault.vault.azure.net/secrets/szechuan/8299270089a748ada5e33a448fb968dc
       field: password
 pre_onboard_enabled:
   - name: provision_rest
@@ -48,7 +48,7 @@ extension_packages:
 #    - extensionType: as3
 #      type: url
 #      value: https://raw.githubusercontent.com/F5Networks/f5-bigip-runtime-init/main/examples/declarations/as3.json
-
+      
 EOF
 
 curl https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.2.1/dist/f5-bigip-runtime-init-1.2.1-1.gz.run -o f5-bigip-runtime-init-1.2.1-1.gz.run && bash f5-bigip-runtime-init-1.2.1-1.gz.run -- '--cloud azure'
