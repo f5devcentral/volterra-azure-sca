@@ -40,7 +40,7 @@ extension_packages:
     - extensionType: ts
       extensionVersion: 1.19.0
 extension_services:
-  service_operations: 
+  service_operations:
     - extensionType: do
       type: inline
       value: ${declative_onboarding}
