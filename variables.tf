@@ -2,7 +2,7 @@
 variable "projectPrefix" {
   type        = string
   description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
-  default     = "ecbad9f1"
+  default     = "bcbad9f1"
 }
 variable "adminUserName" {
   type        = string
@@ -104,11 +104,8 @@ variable "azure_subnets" {
     "management"  = "10.90.0.0/24"
     "external"    = "10.90.1.0/24"
     "internal"    = "10.90.2.0/24"
-    "vdms"        = "10.90.3.0/24"
     "inspect_ext" = "10.90.4.0/24"
     "inspect_int" = "10.90.5.0/24"
-    "waf_ext"     = "10.90.6.0/24"
-    "waf_int"     = "10.90.7.0/24"
     "application" = "10.90.10.0/24"
   }
 }
@@ -127,10 +124,10 @@ variable "f5_t1_ext" {
   description = "Tier 1 BIG-IP External IPs.  These must be in the external subnet."
   type        = map(string)
   default = {
-    f5vm01ext     = "10.90.1.14"
-    f5vm01ext_sec = "10.90.1.11"
-    f5vm02ext     = "10.90.1.15"
-    f5vm02ext_sec = "10.90.1.12"
+    f5vm01ext     = "10.90.4.14"
+    f5vm01ext_sec = "10.90.4.11"
+    f5vm02ext     = "10.90.4.15"
+    f5vm02ext_sec = "10.90.4.12"
   }
 }
 
@@ -138,64 +135,13 @@ variable "f5_t1_int" {
   description = "Tier 1 BIG-IP Internal IPs.  These must be in the internal subnet."
   type        = map(string)
   default = {
-    f5vm01int     = "10.90.2.14"
-    f5vm01int_sec = "10.90.2.11"
-    f5vm02int     = "10.90.2.15"
-    f5vm02int_sec = "10.90.2.12"
+    f5vm01int     = "10.90.5.14"
+    f5vm01int_sec = "10.90.5.11"
+    f5vm02int     = "10.90.5.15"
+    f5vm02int_sec = "10.90.5.12"
   }
 }
 
-variable "f5_t3_ext" {
-  description = "Tier 3 BIG-IP External IPs.  These must be in the waf external subnet."
-  type        = map(string)
-  default = {
-    f5vm03ext     = "10.90.6.4"
-    f5vm03ext_sec = "10.90.6.11"
-    f5vm04ext     = "10.90.6.5"
-    f5vm04ext_sec = "10.90.6.12"
-  }
-}
-
-variable "f5_t3_int" {
-  description = "Tier 3 BIG-IP Internal IPs.  These must be in the waf internal subnet."
-  type        = map(string)
-  default = {
-    f5vm03int     = "10.90.7.4"
-    f5vm03int_sec = "10.90.7.11"
-    f5vm04int     = "10.90.7.5"
-    f5vm04int_sec = "10.90.7.12"
-  }
-}
-
-variable "internalILBIPs" {
-  description = "REQUIRED: Used by One and Three Tier.  Azure internal load balancer ips, these are used for ingress and egress."
-  type        = map(string)
-  default     = {}
-}
-
-variable "ilb01ip" {
-  type        = string
-  description = "REQUIRED: Used by One and Three Tier.  Azure internal load balancer ip, this is used as egress, must be in internal subnet."
-  default     = "10.90.2.10"
-}
-
-variable "ilb02ip" {
-  type        = string
-  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as egress, must be in waf_ext subnet."
-  default     = "10.90.6.10"
-}
-
-variable "ilb03ip" {
-  type        = string
-  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as ingress, must be in waf_ext subnet."
-  default     = "10.90.6.13"
-}
-
-variable "ilb04ip" {
-  type        = string
-  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as ingress, must be in inspect_external subnet."
-  default     = "10.90.4.13"
-}
 
 variable "app01ip" {
   type        = string
@@ -263,8 +209,6 @@ variable "hosts" {
   default = {
     "host1" = "f5vm01"
     "host2" = "f5vm02"
-    "host3" = "f5vm03"
-    "host4" = "f5vm04"
   }
 }
 
