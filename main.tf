@@ -1,13 +1,28 @@
 # main.tf
 
+# Util Module
+# - Random Prefix Generation
+# - Random Password Generation
+module "util" {
+  source = "./util"
+}
+
+# Azure Module
+# Create all Azure Dependencies
 module "azure" {
   source        = "./azure"
   location      = var.location
-  projectPrefix = var.projectPrefix
+  namespace     = var.namespace
+  projectPrefix = module.util.env_prefix
   cidr          = var.cidr
   subnets       = var.azure_subnets
+  tags          = var.tags
 }
 
+# Volterra Module
+# Build Site Token and Cloud Credential
+# Build out Azure Site
+# Build out Origin Pool & LB
 module "volterra" {
   source = "./volterra"
 
@@ -23,7 +38,7 @@ module "volterra" {
   api_p12_file          = var.api_p12_file
   region                = var.region
   location              = var.location
-  projectPrefix         = var.projectPrefix
+  projectPrefix         = module.util.env_prefix
   sshPublicKeyPath      = var.sshPublicKeyPath
   sshPublicKey          = var.sshPublicKey
   azure_client_id       = var.azure_client_id
@@ -37,6 +52,9 @@ module "volterra" {
   azure_subnets         = var.azure_subnets
   subnet_internal       = module.azure.azure_subnet_internal
   subnet_external       = module.azure.azure_subnet_external
+  bigip_external        = var.f5_t1_ext["f5vm01ext"]
+  delegated_domain      = var.delegated_dns_domain
+  tags                  = var.tags
 }
 
 module "firewall" {
@@ -60,8 +78,8 @@ module "firewall" {
   product                = var.product
   bigip_version          = var.bigip_version
   adminUserName          = var.adminUserName
-  adminPassword          = var.adminPassword
-  projectPrefix          = var.projectPrefix
+  adminPassword          = module.util.admin_password
+  projectPrefix          = module.util.env_prefix
   instanceType           = var.instanceType
   subnets                = var.azure_subnets
   cidr                   = var.cidr
@@ -85,11 +103,11 @@ module "applications" {
   location       = var.location
   region         = var.region
   resource_group = module.azure.azure_resource_group_main
-  projectPrefix  = var.projectPrefix
+  projectPrefix  = module.util.env_prefix
   security_group = module.azure.azurerm_network_security_group_main
   appSubnet      = module.azure.azurerm_subnet_application
   adminUserName  = var.adminUserName
-  adminPassword  = var.adminPassword
+  adminPassword  = module.util.admin_password
   app01ip        = var.app01ip
   tags           = var.tags
   timezone       = var.timezone

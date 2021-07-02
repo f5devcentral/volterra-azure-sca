@@ -1,16 +1,20 @@
 # azure.tf
 
 data "azurerm_client_config" "current" {}
+data "azurerm_subscription" "primary" {
+}
 
 # Create a Resource Group for the new Virtual Machines
 resource "azurerm_resource_group" "main" {
   name     = "${var.projectPrefix}_rg"
   location = var.location
+
+  tags = var.tags
 }
 
 # Create KeyVault so Vinnie doesnt yell at me
 resource "azurerm_key_vault" "keyvault" {
-  name                            = "${var.projectPrefix}-vault"
+  name                            = "${var.namespace}-keyvault"
   location                        = azurerm_resource_group.main.location
   resource_group_name             = azurerm_resource_group.main.name
   enabled_for_disk_encryption     = true
