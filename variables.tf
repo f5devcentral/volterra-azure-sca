@@ -1,19 +1,19 @@
 # Azure Environment
-variable "projectPrefix" {
-  type        = string
-  description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
-  default     = "ccbad9f1"
-}
+# variable "projectPrefix" {
+#   type        = string
+#   description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
+#   default     = "ccbad9f1"
+# }
 variable "adminUserName" {
   type        = string
   description = "REQUIRED: Admin Username for All systems"
   default     = "xadmin"
 }
-variable "adminPassword" {
-  type        = string
-  description = "REQUIRED: Admin Password for all systems"
-  default     = "pleaseUseVault123!!"
-}
+# variable "adminPassword" {
+#   type        = string
+#   description = "REQUIRED: Admin Password for all systems"
+#   default     = "pleaseUseVault123!!"
+# }
 variable "location" {
   type        = string
   description = "REQUIRED: Azure Region: usgovvirginia, usgovarizona, etc. For a list of available locations for your subscription use `az account list-locations -o table`"
@@ -24,11 +24,11 @@ variable "region" {
   description = "Azure Region: US Gov Virginia, US Gov Arizona, etc"
   default     = "Canada Central"
 }
-variable "deploymentType" {
-  type        = string
-  description = "REQUIRED: This determines the type of deployment; one tier versus three tier: one_tier, three_tier"
-  default     = "three_tier"
-}
+# variable "deploymentType" {
+#   type        = string
+#   description = "REQUIRED: This determines the type of deployment; one tier versus three tier: one_tier, three_tier"
+#   default     = "three_tier"
+# }
 variable "sshPublicKey" {
   type        = string
   description = "OPTIONAL: ssh public key for instances"
@@ -75,6 +75,9 @@ variable "name" {
 }
 variable "volterra_tf_action" {
   default = "plan"
+}
+variable "delegated_dns_domain" {
+  default = "testdomain.com"
 }
 
 variable "api_url" {
@@ -234,11 +237,13 @@ variable "tags" {
   description = "Environment tags for objects"
   type        = map(string)
   default = {
-    "purpose"     = "public"
-    "environment" = "f5env"
-    "owner"       = "f5owner"
-    "group"       = "f5group"
-    "costcenter"  = "f5costcenter"
-    "application" = "f5app"
+    purpose     = "public"
+    environment = "azure"
+    owner       = "f5owner"
+    group       = "f5group"
+    costcenter  = "f5costcenter"
+    application = "f5app"
+    creator     = "Terraform"
+    delete      = "True"
   }
 }

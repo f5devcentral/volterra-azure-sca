@@ -5,6 +5,8 @@ variable "region" {}
 variable "sshPublicKey" {}
 variable "sshPublicKeyPath" {}
 variable "existing_vnet" {}
+variable "bigip_external" {}
+variable "delegated_domain" {}
 
 variable "namespace" {
   default = "default"

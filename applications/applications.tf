@@ -82,6 +82,7 @@ resource "azurerm_virtual_machine" "app01-vm" {
               #!/bin/bash
               apt-get update -y;
               apt-get install -y docker.io;
+              sysctl -w vm.max_map_count=262144
               # demo app
               docker run -d -p 443:443 -p 80:80 --restart unless-stopped -e F5DEMO_APP=website \
                -e F5DEMO_NODENAME='F5 Azure' -e F5DEMO_COLOR=ffd734 -e F5DEMO_NODENAME_SSL='F5 Azure (SSL)' \
@@ -89,7 +90,7 @@ resource "azurerm_virtual_machine" "app01-vm" {
               # juice shop
               docker run -d --restart always -p 3000:3000 bkimminich/juice-shop
               # ELK
-              docker run -d --restart always -p 5601:5601 -p 9200:9200 -p 5044:5044 -it --name elk sebp/elk
+              docker run -d --restart always -p 5601:5601 -p 9200:9200 -p 9300:9300 -p 9600:9600 -p 5044:5044 -it --name elk sebp/elk
               # Prometheus
               echo ${base64encode(data.template_file.prometheus.rendered)} | base64 --decode >> /var/tmp/prometheus.yml
               docker run -d --restart always -p 9090:9090 -v /var/tmp/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
