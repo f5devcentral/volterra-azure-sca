@@ -130,14 +130,13 @@ data "http" "onboard" {
 }
 
 data "http" "appservice" {
-  url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-AS3/master/dist/terraform/latest/sccaSingleTier.json"
+  url = "https://raw.githubusercontent.com/Mikej81/f5-bigip-hardening-AS3/master/dist/terraform/latest/sccaVoltSingleTier.json"
 }
 
 data "template_file" "vm01_do_json" {
   template = data.http.onboard.body
   vars = {
     host1           = var.hosts["host1"]
-    host2           = var.hosts["host2"]
     local_host      = var.hosts["host1"]
     external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["external"]), 1)}"
     internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
@@ -182,6 +181,7 @@ data "template_file" "as3_json" {
 
 data "template_file" "startup_script" {
   template = templatefile("${path.module}/../templates/startup_script.tpl", {
+    mgmtGateway          = local.mgmt_gw
     keyvault_uri         = var.azure_key_vault_uri
     secret_id            = var.azure_key_vault_secret
     declative_onboarding = data.template_file.vm01_do_json.rendered
@@ -255,20 +255,20 @@ resource "azurerm_virtual_machine" "f5vm01" {
 # SETTINGS
 # }
 
-# # Debug Template Outputs
-# resource "local_file" "vm01_do_file" {
-#   content  = data.template_file.vm01_do_json.rendered
-#   filename = "${path.module}/vm01_do_data.json"
-# }
+# Debug Template Outputs
+resource "local_file" "vm01_do_file" {
+  content  = data.template_file.vm01_do_json.rendered
+  filename = "${path.module}/../debug/vm01_do_data.json"
+}
 
-# resource "local_file" "vm_as3_file" {
-#   content  = data.template_file.as3_json.rendered
-#   filename = "${path.module}/vm_as3_data.json"
-# }
+resource "local_file" "vm_as3_file" {
+  content  = data.template_file.as3_json.rendered
+  filename = "${path.module}/../debug/vm_as3_data.json"
+}
 
 resource "local_file" "onboard_file" {
   content  = data.template_file.startup_script.rendered
-  filename = "${path.module}/startup-init.sh"
+  filename = "${path.module}/../debug/startup-init.sh"
 }
 
 output "azurerm_public_ip_pip" {

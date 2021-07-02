@@ -105,6 +105,13 @@ resource "azurerm_subnet" "inspect_internal" {
   resource_group_name  = azurerm_resource_group.main.name
   address_prefixes     = [var.subnets["inspect_int"]]
 }
+# Create the Demo Application Subnet within the Virtual Network
+resource "azurerm_subnet" "application" {
+  name                 = "application"
+  virtual_network_name = azurerm_virtual_network.main.name
+  resource_group_name  = azurerm_resource_group.main.name
+  address_prefixes     = [var.subnets["application"]]
+}
 
 # Obtain Gateway IP for each Subnet
 locals {
@@ -125,3 +132,4 @@ output "azure_subnet_external" { value = azurerm_subnet.external }
 output "azure_subnet_internal" { value = azurerm_subnet.internal }
 output "azure_subnet_inspec_int" { value = azurerm_subnet.inspect_internal }
 output "azure_subnet_inspec_ext" { value = azurerm_subnet.inspect_external }
+output "azurerm_subnet_application" { value = azurerm_subnet.application }
