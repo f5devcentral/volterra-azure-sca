@@ -58,6 +58,9 @@ for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L $PACKAGE_URL -o /var/config/rest/downloads/$PACKAGE && break || sleep 10
 done
 
+# fix networks, for some reason the metric gets all whacked
+route add -net default gw ${mgmtGateway} netmask 0.0.0.0 dev mgmt metric 0
+
 # Install
 bash /var/config/rest/downloads/f5-bigip-runtime-init-1.2.1-1.gz.run -- "--cloud azure"
 # Run

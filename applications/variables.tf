@@ -2,13 +2,17 @@
 variable "projectPrefix" {
   type        = string
   description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
-  default     = "ccbad9f1"
+  default     = "ccbad9e7"
 }
 variable "adminUserName" {
   type        = string
   description = "REQUIRED: Admin Username for All systems"
   default     = "xadmin"
 }
+variable "resource_group" {}
+variable "security_group" {}
+variable "appSubnet" {}
+
 variable "adminPassword" {
   type        = string
   description = "REQUIRED: Admin Password for all systems"
@@ -17,17 +21,22 @@ variable "adminPassword" {
 variable "location" {
   type        = string
   description = "REQUIRED: Azure Region: usgovvirginia, usgovarizona, etc. For a list of available locations for your subscription use `az account list-locations -o table`"
-  default     = "canadacentral"
+  default     = "usgovvirginia"
 }
 variable "region" {
   type        = string
   description = "Azure Region: US Gov Virginia, US Gov Arizona, etc"
-  default     = "Canada Central"
+  default     = "US Gov Virginia"
 }
 variable "deploymentType" {
   type        = string
   description = "REQUIRED: This determines the type of deployment; one tier versus three tier: one_tier, three_tier"
   default     = "three_tier"
+}
+variable "deployDemoApp" {
+  type        = string
+  description = "OPTIONAL: Deploy Demo Application with Stack. Recommended to show functionality.  Options: deploy, anything else."
+  default     = "deploy"
 }
 variable "sshPublicKey" {
   type        = string
@@ -37,59 +46,8 @@ variable "sshPublicKey" {
 variable "sshPublicKeyPath" {
   type        = string
   description = "OPTIONAL: ssh public key path for instances"
-  default     = "~/.ssh/id_rsa.pub"
+  default     = "/mykey.pub"
 }
-variable "api_p12_file" {
-  type        = string
-  description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./api-creds.p12"
-}
-
-variable "api_cert" {
-  type        = string
-  description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./api2.cer"
-}
-variable "api_key" {
-  type        = string
-  description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
-  default     = "./api.key"
-}
-
-variable "tenant_name" {
-  type        = string
-  description = "REQUIRED:  This is your Volterra Tenant Name:  https://<tenant_name>.console.ves.volterra.io/api"
-  default     = "mr-customer"
-}
-
-variable "namespace" {
-  type        = string
-  description = "REQUIRED:  This is your Volterra App Namespace"
-  default     = "namespace"
-}
-
-variable "name" {
-  type        = string
-  description = "REQUIRED:  This is name for your deployment"
-  default     = "nebula"
-}
-variable "volterra_tf_action" {
-  default = "plan"
-}
-
-variable "api_url" {
-  type        = string
-  description = "REQUIRED:  This is your Volterra API url"
-  default     = "https://playground.console.ves.volterra.io/api"
-}
-
-variable "azure_client_id" { default = "" }
-variable "azure_client_secret" { default = "" }
-variable "azure_tenant_id" { default = "" }
-variable "azure_subscription_id" { default = "" }
-
-variable "gateway_type" { default = "INGRESS_EGRESS_GATEWAY" }
-variable "fleet_label" { default = "fleet_label" }
 
 # NETWORK
 variable "cidr" {
@@ -97,15 +55,18 @@ variable "cidr" {
   default     = "10.90.0.0/16"
 }
 
-variable "azure_subnets" {
+variable "subnets" {
   type        = map(string)
   description = "REQUIRED: Subnet CIDRs"
   default = {
     "management"  = "10.90.0.0/24"
     "external"    = "10.90.1.0/24"
     "internal"    = "10.90.2.0/24"
+    "vdms"        = "10.90.3.0/24"
     "inspect_ext" = "10.90.4.0/24"
     "inspect_int" = "10.90.5.0/24"
+    "waf_ext"     = "10.90.6.0/24"
+    "waf_int"     = "10.90.7.0/24"
     "application" = "10.90.10.0/24"
   }
 }
@@ -114,8 +75,10 @@ variable "f5_mgmt" {
   description = "F5 BIG-IP Management IPs.  These must be in the management subnet."
   type        = map(string)
   default = {
-    f5vm01mgmt = "10.90.0.14"
-    f5vm02mgmt = "10.90.0.15"
+    f5vm01mgmt = "10.90.0.4"
+    f5vm02mgmt = "10.90.0.5"
+    f5vm03mgmt = "10.90.0.6"
+    f5vm04mgmt = "10.90.0.7"
   }
 }
 
@@ -124,10 +87,10 @@ variable "f5_t1_ext" {
   description = "Tier 1 BIG-IP External IPs.  These must be in the external subnet."
   type        = map(string)
   default = {
-    f5vm01ext     = "10.90.4.14"
-    f5vm01ext_sec = "10.90.4.11"
-    f5vm02ext     = "10.90.4.15"
-    f5vm02ext_sec = "10.90.4.12"
+    f5vm01ext     = "10.90.1.4"
+    f5vm01ext_sec = "10.90.1.11"
+    f5vm02ext     = "10.90.1.5"
+    f5vm02ext_sec = "10.90.1.12"
   }
 }
 
@@ -135,13 +98,64 @@ variable "f5_t1_int" {
   description = "Tier 1 BIG-IP Internal IPs.  These must be in the internal subnet."
   type        = map(string)
   default = {
-    f5vm01int     = "10.90.5.14"
-    f5vm01int_sec = "10.90.5.11"
-    f5vm02int     = "10.90.5.15"
-    f5vm02int_sec = "10.90.5.12"
+    f5vm01int     = "10.90.2.4"
+    f5vm01int_sec = "10.90.2.11"
+    f5vm02int     = "10.90.2.5"
+    f5vm02int_sec = "10.90.2.12"
   }
 }
 
+variable "f5_t3_ext" {
+  description = "Tier 3 BIG-IP External IPs.  These must be in the waf external subnet."
+  type        = map(string)
+  default = {
+    f5vm03ext     = "10.90.6.4"
+    f5vm03ext_sec = "10.90.6.11"
+    f5vm04ext     = "10.90.6.5"
+    f5vm04ext_sec = "10.90.6.12"
+  }
+}
+
+variable "f5_t3_int" {
+  description = "Tier 3 BIG-IP Internal IPs.  These must be in the waf internal subnet."
+  type        = map(string)
+  default = {
+    f5vm03int     = "10.90.7.4"
+    f5vm03int_sec = "10.90.7.11"
+    f5vm04int     = "10.90.7.5"
+    f5vm04int_sec = "10.90.7.12"
+  }
+}
+
+variable "internalILBIPs" {
+  description = "REQUIRED: Used by One and Three Tier.  Azure internal load balancer ips, these are used for ingress and egress."
+  type        = map(string)
+  default     = {}
+}
+
+variable "ilb01ip" {
+  type        = string
+  description = "REQUIRED: Used by One and Three Tier.  Azure internal load balancer ip, this is used as egress, must be in internal subnet."
+  default     = "10.90.2.10"
+}
+
+variable "ilb02ip" {
+  type        = string
+  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as egress, must be in waf_ext subnet."
+  default     = "10.90.6.10"
+}
+
+variable "ilb03ip" {
+  type        = string
+  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as ingress, must be in waf_ext subnet."
+  default     = "10.90.6.13"
+}
+
+variable "ilb04ip" {
+  type        = string
+  description = "REQUIRED: Used by Three Tier only.  Azure waf external load balancer ip, this is used as ingress, must be in inspect_external subnet."
+  default     = "10.90.4.13"
+}
 
 variable "app01ip" {
   type        = string
@@ -189,7 +203,7 @@ variable "product" {
 variable "bigip_version" {
   type        = string
   description = "REQUIRED: BIG-IP Version.  Note: verify available versions before using as images can change."
-  default     = "latest"
+  default     = "14.1.400000"
 }
 
 # BIGIP Setup
@@ -209,6 +223,8 @@ variable "hosts" {
   default = {
     "host1" = "f5vm01"
     "host2" = "f5vm02"
+    "host3" = "f5vm03"
+    "host4" = "f5vm04"
   }
 }
 

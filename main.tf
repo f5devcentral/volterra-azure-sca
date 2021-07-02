@@ -42,7 +42,7 @@ module "volterra" {
 module "firewall" {
   source = "./firewall"
   depends_on = [
-    module.azure.azure_resource_group_main, module.azure.azure_virtual_network_main, module.azure.azure_subnet_internal, module.azure.azure_subnet_external, module.azure.azure_key_vault_uri, module.azure.azure_key_vault_secret
+    module.azure.azure_resource_group_main, module.azure.azure_key_vault_secret, module.azure.azure_virtual_network_main, module.azure.azure_subnet_internal, module.azure.azure_subnet_external, module.azure.azure_key_vault_uri, module.azure.azure_key_vault_secret
   ]
   sshPublicKey           = var.sshPublicKeyPath
   location               = var.location
@@ -78,4 +78,20 @@ module "firewall" {
   timezone               = var.timezone
   ntp_server             = var.ntp_server
   dns_server             = var.dns_server
+}
+
+module "applications" {
+  source         = "./applications"
+  location       = var.location
+  region         = var.region
+  resource_group = module.azure.azure_resource_group_main
+  projectPrefix  = var.projectPrefix
+  security_group = module.azure.azurerm_network_security_group_main
+  appSubnet      = module.azure.azurerm_subnet_application
+  adminUserName  = var.adminUserName
+  adminPassword  = var.adminPassword
+  app01ip        = var.app01ip
+  tags           = var.tags
+  timezone       = var.timezone
+  instanceType   = var.appInstanceType
 }
