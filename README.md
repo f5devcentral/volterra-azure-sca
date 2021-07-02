@@ -18,7 +18,7 @@ Volterra version of SCA/SCCA/SACA
 - Azure Key Vaults takes 2m to provision. "module.azure.azurerm_key_vault.keyvault: Creation complete after 2m5s"
   - Doesnt work with runtime-init for some reason, troubleshoot later.
 
-![Rough Diagram](/images/sce.png)
+![Rough Diagram](/images/sce1-1.png)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
