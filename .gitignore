@@ -33,4 +33,6 @@ override.tf.json
 **/creds/
 prep.sh
 
+**/debug/*
+
 .DS_Store
