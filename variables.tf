@@ -1,19 +1,12 @@
-# Azure Environment
-# variable "projectPrefix" {
-#   type        = string
-#   description = "REQUIRED: Prefix to prepend to all objects created, minus Windows Jumpbox"
-#   default     = "ccbad9f1"
-# }
+# Environment
+// Required Variable
 variable "adminUserName" {
   type        = string
   description = "REQUIRED: Admin Username for All systems"
   default     = "xadmin"
 }
-# variable "adminPassword" {
-#   type        = string
-#   description = "REQUIRED: Admin Password for all systems"
-#   default     = "pleaseUseVault123!!"
-# }
+
+// Required Variable
 variable "location" {
   type        = string
   description = "REQUIRED: Azure Region: usgovvirginia, usgovarizona, etc. For a list of available locations for your subscription use `az account list-locations -o table`"
@@ -24,11 +17,7 @@ variable "region" {
   description = "Azure Region: US Gov Virginia, US Gov Arizona, etc"
   default     = "Canada Central"
 }
-# variable "deploymentType" {
-#   type        = string
-#   description = "REQUIRED: This determines the type of deployment; one tier versus three tier: one_tier, three_tier"
-#   default     = "three_tier"
-# }
+
 variable "sshPublicKey" {
   type        = string
   description = "OPTIONAL: ssh public key for instances"
@@ -39,6 +28,7 @@ variable "sshPublicKeyPath" {
   description = "OPTIONAL: ssh public key path for instances"
   default     = "~/.ssh/id_rsa.pub"
 }
+// Required Variable
 variable "api_p12_file" {
   type        = string
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
@@ -55,31 +45,32 @@ variable "api_key" {
   description = "REQUIRED:  This is the path to the Volterra API Key.  See https://volterra.io/docs/how-to/user-mgmt/credentials"
   default     = "./api.key"
 }
-
+// Required Variable
 variable "tenant_name" {
   type        = string
   description = "REQUIRED:  This is your Volterra Tenant Name:  https://<tenant_name>.console.ves.volterra.io/api"
   default     = "mr-customer"
 }
-
+// Required Variable
 variable "namespace" {
   type        = string
   description = "REQUIRED:  This is your Volterra App Namespace"
   default     = "namespace"
 }
-
+// Required Variable
 variable "name" {
   type        = string
   description = "REQUIRED:  This is name for your deployment"
   default     = "nebula"
 }
+// Required Variable
 variable "volterra_tf_action" {
   default = "plan"
 }
 variable "delegated_dns_domain" {
   default = "testdomain.com"
 }
-
+// Required Variable
 variable "api_url" {
   type        = string
   description = "REQUIRED:  This is your Volterra API url"
@@ -95,6 +86,7 @@ variable "gateway_type" { default = "INGRESS_EGRESS_GATEWAY" }
 variable "fleet_label" { default = "fleet_label" }
 
 # NETWORK
+// Required Variable
 variable "cidr" {
   description = "REQUIRED: VNET Network CIDR"
   default     = "10.90.0.0/16"

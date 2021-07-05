@@ -12,6 +12,22 @@ exec 1>&-
 exec 1>$npipe
 exec 2>&1
 
+# fix networks, for some reason the metric gets all whacked
+# metadata route
+echo  -e 'create cli transaction;
+modify sys db config.allow.rfc3927 value enable;
+create sys management-route metadata-route network 169.254.169.254/32 gateway ${mgmtGateway};
+submit cli transaction' | tmsh -q
+route add -net default gw ${mgmtGateway} netmask 0.0.0.0 dev mgmt metric 0
+
+### redo as3
+# Vinnie make fix.  @Vinnie357 forever
+cat > /config/as3.json <<EOF
+${application_services}
+EOF
+externalVip=$(curl -sf --retry 20 -H Metadata:true "http://169.254.169.254/metadata/instance/network/interface?api-version=2017-08-01" | jq -r '.[1].ipv4.ipAddress[1].privateIpAddress')
+sed -i "s/-external-virtual-address-/$externalVip/g" /config/as3.json
+
 cat << 'EOF' > /config/cloud/runtime-init-conf.yaml
 runtime_parameters: []
   # - name: ADMIN_PASS
@@ -45,8 +61,8 @@ extension_services:
       type: inline
       value: ${declative_onboarding}
     - extensionType: as3
-      type: inline
-      value: ${application_services}
+      type: url
+      value: file:///config/as3.json
 post_onboard_enabled: []
 EOF
 
@@ -57,9 +73,6 @@ PACKAGE_URL="https://cdn.f5.com/product/cloudsolutions/f5-bigip-runtime-init/v1.
 for i in {1..30}; do
     curl -fv --retry 1 --connect-timeout 5 -L $PACKAGE_URL -o /var/config/rest/downloads/$PACKAGE && break || sleep 10
 done
-
-# fix networks, for some reason the metric gets all whacked
-route add -net default gw ${mgmtGateway} netmask 0.0.0.0 dev mgmt metric 0
 
 # Install
 bash /var/config/rest/downloads/f5-bigip-runtime-init-1.2.1-1.gz.run -- "--cloud azure"

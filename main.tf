@@ -11,11 +11,13 @@ module "util" {
 # Create all Azure Dependencies
 module "azure" {
   source        = "./azure"
-  location      = var.location
-  namespace     = var.namespace
   projectPrefix = module.util.env_prefix
+  location      = var.location
+  region        = var.region
+  namespace     = var.namespace
   cidr          = var.cidr
   subnets       = var.azure_subnets
+  adminPassword = module.util.admin_password
   tags          = var.tags
 }
 
@@ -104,7 +106,7 @@ module "applications" {
   region         = var.region
   resource_group = module.azure.azure_resource_group_main
   projectPrefix  = module.util.env_prefix
-  security_group = module.azure.azurerm_network_security_group_main
+  security_group = module.azure.azurerm_network_security_group_app
   appSubnet      = module.azure.azurerm_subnet_application
   adminUserName  = var.adminUserName
   adminPassword  = module.util.admin_password
