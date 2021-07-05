@@ -402,3 +402,50 @@ resource "volterra_http_loadbalancer" "elastic" {
   }
 
 }
+
+resource "volterra_http_loadbalancer" "juiceshop" {
+  name      = format("%s-juice-lb", var.name)
+  namespace = var.namespace
+
+  depends_on = [
+    volterra_origin_pool.juiceshop
+  ]
+
+  // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set
+  advertise_on_public_default_vip = true
+
+  // One of the arguments from this list "no_challenge js_challenge captcha_challenge policy_based_challenge" must be set
+  no_challenge = true
+
+  domains = ["juice.${var.delegated_domain}"]
+
+  // One of the arguments from this list "round_robin least_active random source_ip_stickiness cookie_stickiness ring_hash" must be set
+
+  round_robin = true
+
+  // One of the arguments from this list "https_auto_cert https http" must be set
+
+  https_auto_cert {
+    add_hsts      = true
+    http_redirect = true
+    no_mtls       = true
+
+  }
+  // One of the arguments from this list "disable_rate_limit rate_limit" must be set
+  disable_rate_limit = true
+  // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
+  service_policies_from_namespace = true
+
+  // One of the arguments from this list "waf waf_rule disable_waf" must be set
+
+  disable_waf = true
+
+  default_route_pools {
+    endpoint_subsets = null
+    pool {
+      name      = format("%s-juice-pool", var.name)
+      namespace = var.namespace
+    }
+  }
+
+}

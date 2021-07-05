@@ -1,8 +1,7 @@
 # azure.tf
 
 data "azurerm_client_config" "current" {}
-data "azurerm_subscription" "primary" {
-}
+data "azurerm_subscription" "primary" {}
 
 # Create a Resource Group for the new Virtual Machines
 resource "azurerm_resource_group" "main" {

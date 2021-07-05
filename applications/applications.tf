@@ -1,15 +1,15 @@
 # Application Host // Docker
 
-resource "random_id" "storageId" {
-  keepers = {
-    # Generate a new ID only when a new resource group is defined
-    resource_group = var.resource_group.name
-  }
-  byte_length = 8
-}
+# resource "random_id" "storageId" {
+#   keepers = {
+#     # Generate a new ID only when a new resource group is defined
+#     resource_group = var.resource_group.name
+#   }
+#   byte_length = 8
+# }
 
 resource "azurerm_storage_account" "appvm_storageaccount" {
-  name                     = "app${random_id.storageId.hex}"
+  name                     = "app${var.projectPrefix}"
   resource_group_name      = var.resource_group.name
   location                 = var.resource_group.location
   account_replication_type = "LRS"

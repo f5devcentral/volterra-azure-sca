@@ -9,4 +9,5 @@ terraform plan
 read -p "Press enter to continue"
 terraform apply --auto-approve
 duration=$(( SECONDS - start ))
-echo "Operation took $duration seconds"
+now=$(date +"%T")
+echo "Operation Completed at $now, after $duration seconds"
