@@ -103,7 +103,7 @@ resource "volterra_origin_pool" "prometheus" {
 
   }
 
-  port = "8088"
+  port = "8080"
 
   no_tls = true
 
@@ -213,12 +213,18 @@ resource "volterra_http_loadbalancer" "kibana" {
 
   // One of the arguments from this list "https_auto_cert https http" must be set
 
-  https_auto_cert {
-    add_hsts      = true
-    http_redirect = true
-    no_mtls       = true
-
+  //Stop waisting certs for testing!
+  http {
+    dns_volterra_managed = true
   }
+
+  # https_auto_cert {
+  #   add_hsts      = true
+  #   http_redirect = true
+  #   no_mtls       = true
+
+  # }
+
   // One of the arguments from this list "disable_rate_limit rate_limit" must be set
   disable_rate_limit = true
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
@@ -260,12 +266,17 @@ resource "volterra_http_loadbalancer" "elastic" {
 
   // One of the arguments from this list "https_auto_cert https http" must be set
 
-  https_auto_cert {
-    add_hsts      = true
-    http_redirect = true
-    no_mtls       = true
-
+  //Stop waisting certs for testing!
+  http {
+    dns_volterra_managed = true
   }
+
+  # https_auto_cert {
+  #   add_hsts      = true
+  #   http_redirect = true
+  #   no_mtls       = true
+
+  # }
   // One of the arguments from this list "disable_rate_limit rate_limit" must be set
   disable_rate_limit = true
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
@@ -307,12 +318,17 @@ resource "volterra_http_loadbalancer" "juiceshop" {
 
   // One of the arguments from this list "https_auto_cert https http" must be set
 
-  https_auto_cert {
-    add_hsts      = true
-    http_redirect = true
-    no_mtls       = true
-
+  //Stop waisting certs for testing!
+  http {
+    dns_volterra_managed = true
   }
+
+  # https_auto_cert {
+  #   add_hsts      = true
+  #   http_redirect = true
+  #   no_mtls       = true
+
+  # }
   // One of the arguments from this list "disable_rate_limit rate_limit" must be set
   disable_rate_limit = true
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set

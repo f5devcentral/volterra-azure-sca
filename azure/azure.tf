@@ -137,3 +137,4 @@ output "azure_subnet_internal" { value = azurerm_subnet.internal }
 output "azure_subnet_inspec_int" { value = azurerm_subnet.inspect_internal }
 output "azure_subnet_inspec_ext" { value = azurerm_subnet.inspect_external }
 output "azurerm_subnet_application" { value = azurerm_subnet.application }
+output "azure_subscription_primary" { value = data.azurerm_subscription.primary }
