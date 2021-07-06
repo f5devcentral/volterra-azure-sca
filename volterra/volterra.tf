@@ -116,3 +116,17 @@ resource "volterra_tf_params_action" "action_test" {
   action          = var.volterra_tf_action
   wait_for_action = true
 }
+
+
+data "azurerm_resources" "volterra_resource_group" {
+  #resource_group_name = "${var.projectPrefix}_volt_rg"
+  name = "${var.projectPrefix}_volt_rg"
+}
+
+output "volterra_resource_group" {
+  value = data.azurerm_resources.volterra_resource_group
+}
+
+output "volterra_resource_group_tags" {
+  value = merge(var.tags, { vesio_site_name = "${volterra_azure_vnet_site.azure_site.name}" })
+}

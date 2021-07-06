@@ -181,6 +181,8 @@ data "template_file" "as3_json" {
 
 data "template_file" "startup_script" {
   template = templatefile("${path.module}/../templates/startup_script.tpl", {
+    uname                = var.adminUserName
+    upassword            = var.adminPassword
     mgmtGateway          = local.mgmt_gw
     keyvault_uri         = var.azure_key_vault_uri
     secret_id            = var.azure_key_vault_secret
@@ -198,6 +200,10 @@ resource "azurerm_virtual_machine" "f5vm01" {
   network_interface_ids        = [azurerm_network_interface.vm01-mgmt-nic.id, azurerm_network_interface.vm01-ext-nic.id, azurerm_network_interface.vm01-int-nic.id]
   vm_size                      = var.instanceType
   availability_set_id          = var.availability_set.id
+
+  depends_on = [
+    var.azure_key_vault_secret
+  ]
 
   delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
