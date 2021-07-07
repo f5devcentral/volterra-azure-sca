@@ -12,6 +12,10 @@ exec 1>&-
 exec 1>$npipe
 exec 2>&1
 
+# wait bigip
+source /usr/lib/bigstart/bigip-ready-functions
+wait_bigip_ready
+
 # fix networks, for some reason the metric gets all whacked
 # metadata route
 echo  -e 'create cli transaction;
@@ -23,8 +27,10 @@ route add -net default gw ${mgmtGateway} netmask 0.0.0.0 dev mgmt metric 0
 ### redo as3
 # Vinnie make fix.  @Vinnie357 forever
 local_host="http://localhost:8100"
+
+as3Url="/mgmt/shared/appsvcs/declare"
 as3CheckUrl="/mgmt/shared/appsvcs/info"
-as3PostUrl="/mgmt/shared/appsvcs/declare"
+as3TaskUrl="/mgmt/shared/appsvcs/task/"
 
 cat > /config/as3.json <<EOF
 ${application_services}
@@ -54,7 +60,7 @@ extension_packages:
     - extensionType: do
       extensionVersion: 1.20.0
     - extensionType: as3
-      extensionVersion: 3.27.0
+      extensionVersion: 3.29.0
     - extensionType: fast
       extensionVersion: 1.8.0
     - extensionType: ts
@@ -81,6 +87,21 @@ done
 admin_username='${uname}'
 admin_password='${upassword}'
 CREDS="$admin_username:$admin_password"
+
+waitActive () {
+checks=0
+while [[ "$checks" -lt 30 ]]; do
+    tmsh -a show sys ready | grep -q no
+   if [ $? == 1 ]; then
+       echo "[INFO: system ready]"
+       break
+   fi
+   echo "[WARN: system not ready yet count: $checks]"
+   tmsh -a show sys ready | grep no
+   let checks=checks+1
+   sleep 10
+done
+}
 
 function checkAS3() {
     # Check AS3 Ready
@@ -210,22 +231,17 @@ do
     as3Status=$(checkAS3)
     echo "AS3 check status: $as3Status"
     if [[ "$as3Status" == *"online"* ]]; then
-        if [ $deviceId == 1 ]; then
-            echo "running as3"
+            echo "running as3: $as3Status"
             runAS3
-            echo "done with as3"
+            echo "done with AS3"
             results=$(restcurl -u $CREDS $as3TaskUrl | jq '.items[] | .id, .results')
-            echo "as3 results: $results"
+            echo "AS3 results: $results"
             break
-        else
-            echo "Not posting as3 device $deviceid not primary"
-            break
-        fi
     elif [ $count -le 2 ]; then
-        echo "Status code: $as3Status  As3 not ready yet..."
+        echo "Status code: $as3Status  AS3 not ready yet..."
         count=$[$count+1]
     else
-        echo "As3 API Status $as3Status"
+        echo "AS3 API Status $as3Status"
         break
     fi
 done
