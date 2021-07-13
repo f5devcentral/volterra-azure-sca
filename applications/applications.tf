@@ -38,6 +38,12 @@ data "template_file" "prometheus" {
   })
 }
 
+data "template_file" "filebeat" {
+  template = templatefile("${path.module}/../templates/filebeat.yml", {
+
+  })
+}
+
 # app01-VM
 resource "azurerm_virtual_machine" "app01-vm" {
   name                = "${var.projectPrefix}-app01-vm"
@@ -80,12 +86,21 @@ resource "azurerm_virtual_machine" "app01-vm" {
                -e F5DEMO_NODENAME='F5 Azure' -e F5DEMO_COLOR=ffd734 -e F5DEMO_NODENAME_SSL='F5 Azure (SSL)' \
                -e F5DEMO_COLOR_SSL=a0bf37 chen23/f5-demo-app:ssl;
               # juice shop
-              docker run -d --restart always -p 3000:3000 bkimminich/juice-shop
+              docker run -d --restart always -p 3000:3000 --name juiceshop bkimminich/juice-shop
               # ELK
               docker run -d --restart always -p 5601:5601 -p 9200:9200 -p 9300:9300 -p 9600:9600 -p 5044:5044 -it --name elk sebp/elk
+              sleep 30
               # Prometheus
               echo ${base64encode(data.template_file.prometheus.rendered)} | base64 --decode >> /var/tmp/prometheus.yml
-              docker run -d --restart always -p 9090:9090 -v /var/tmp/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+              docker run -d --restart always -p 9090:9090 --name prometheus -v /var/tmp/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+              # Filebeat
+              #  Setup
+              echo ${base64encode(data.template_file.filebeat.rendered)} | base64 --decode >> /var/tmp/filebeat.yml
+              docker run --link elk:elk docker.elastic.co/beats/filebeat:7.13.3 setup -E setup.kibana.host=elk:5601 -E output.elasticsearch.hosts=["elk:9200"]
+              #  Run
+              docker run -d --restart always --link elk:elk --name filebeat --user=root --volume="/var/tmp/filebeat.yml:/us/share/filebeat/filebeat.yml:ro" \
+                docker.elastic.co/beats/filebeat:7.13.3 filebeat -e -strict.perms=false \
+                -E output.elasticsearch.hosts=["elk:9200"]
               EOF
   }
 
