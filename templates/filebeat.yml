@@ -1,0 +1,14 @@
+filebeat.config:
+  modules:
+    path: /etc/filebeat/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.inputs:
+  - type: syslog
+    format: auto
+    protocol.tcp:
+      host: "localhost:514"
+#filebeat.autodiscover:
+#  providers:
+#    - type: docker
+#      hints.enabled: true

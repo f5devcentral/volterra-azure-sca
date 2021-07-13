@@ -307,7 +307,11 @@ resource "volterra_http_loadbalancer" "kibana" {
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
-  disable_waf = true
+  #disable_waf = true
+  waf {
+    namespace = var.namespace
+    name      = "${var.namespace}-default-waf"
+  }
 
   default_route_pools {
     endpoint_subsets = null
@@ -359,7 +363,11 @@ resource "volterra_http_loadbalancer" "elastic_json" {
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
-  disable_waf = true
+  #disable_waf = true
+  waf {
+    namespace = var.namespace
+    name      = "${var.namespace}-default-waf"
+  }
 
   default_route_pools {
     endpoint_subsets = null
@@ -411,7 +419,11 @@ resource "volterra_http_loadbalancer" "prometheus" {
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
-  disable_waf = true
+  #disable_waf = true
+  waf {
+    namespace = var.namespace
+    name      = "${var.namespace}-default-waf"
+  }
 
   default_route_pools {
     endpoint_subsets = null
@@ -463,7 +475,11 @@ resource "volterra_http_loadbalancer" "logstash_api" {
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
-  disable_waf = true
+  #disable_waf = true
+  waf {
+    namespace = var.namespace
+    name      = "${var.namespace}-default-waf"
+  }
 
   default_route_pools {
     endpoint_subsets = null
@@ -515,7 +531,11 @@ resource "volterra_http_loadbalancer" "juiceshop" {
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
-  disable_waf = true
+  #disable_waf = true
+  waf {
+    namespace = var.namespace
+    name      = "${var.namespace}-default-waf"
+  }
 
   default_route_pools {
     endpoint_subsets = null
