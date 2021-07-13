@@ -19,6 +19,7 @@ variable "resource_group_name" {}
 variable "volterra_tf_action" {}
 variable "subnet_internal" {}
 variable "subnet_external" {}
+variable "subnet_inspec_ext" {}
 variable "gateway_type" {}
 variable "fleet_label" {}
 variable "cidr" {}

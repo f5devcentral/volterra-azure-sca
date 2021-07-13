@@ -18,6 +18,7 @@ module "azure" {
   cidr          = var.cidr
   subnets       = var.azure_subnets
   adminPassword = module.util.admin_password
+  f5_t1_ext     = var.f5_t1_ext
   tags          = var.tags
 }
 
@@ -54,7 +55,8 @@ module "volterra" {
   azure_subnets         = var.azure_subnets
   subnet_internal       = module.azure.azure_subnet_internal
   subnet_external       = module.azure.azure_subnet_external
-  bigip_external        = var.f5_t1_ext["f5vm01ext"]
+  subnet_inspec_ext     = module.azure.azure_subnet_inspec_ext
+  bigip_external        = var.f5_t1_ext["f5vm01ext_thi"]
   delegated_domain      = var.delegated_dns_domain
   tags                  = var.tags
 }
@@ -71,33 +73,33 @@ module "firewall" {
   azure_key_vault_uri    = module.azure.azure_key_vault_uri
   azure_key_vault_secret = module.azure.azure_key_vault_secret
   security_group         = module.azure.azurerm_network_security_group_main
+  app_security_group     = module.azure.azurerm_network_security_group_app
   namespace              = var.namespace
   subnetMgmt             = module.azure.azure_subnet_mgmt
-  subnetExternal         = module.azure.azure_subnet_inspec_ext
-  subnetInternal         = module.azure.azure_subnet_inspec_int
-  availability_set       = module.azure.azure_availability_set_avset
-  image_name             = var.image_name
-  product                = var.product
-  bigip_version          = var.bigip_version
-  adminUserName          = var.adminUserName
-  adminPassword          = module.util.admin_password
-  projectPrefix          = module.util.env_prefix
-  instanceType           = var.instanceType
-  subnets                = var.azure_subnets
-  cidr                   = var.cidr
-  app01ip                = var.app01ip
-  hosts                  = var.hosts
-  f5_mgmt                = var.f5_mgmt
-  f5_t1_ext              = var.f5_t1_ext
-  f5_t1_int              = var.f5_t1_int
-  winjumpip              = var.winjumpip
-  linuxjumpip            = var.linuxjumpip
-  licenses               = var.licenses
-  asm_policy             = var.asm_policy
-  tags                   = var.tags
-  timezone               = var.timezone
-  ntp_server             = var.ntp_server
-  dns_server             = var.dns_server
+  #subnetExternal         = module.azure.azure_subnet_inspec_ext
+  subnetExternal   = module.azure.azure_subnet_internal
+  subnetInternal   = module.azure.azure_subnet_inspec_int
+  availability_set = module.azure.azure_availability_set_avset
+  image_name       = var.image_name
+  product          = var.product
+  bigip_version    = var.bigip_version
+  adminUserName    = var.adminUserName
+  adminPassword    = module.util.admin_password
+  projectPrefix    = module.util.env_prefix
+  instanceType     = var.instanceType
+  subnets          = var.azure_subnets
+  cidr             = var.cidr
+  app01ip          = var.app01ip
+  hosts            = var.hosts
+  f5_mgmt          = var.f5_mgmt
+  f5_t1_ext        = var.f5_t1_ext
+  f5_t1_int        = var.f5_t1_int
+  licenses         = var.licenses
+  asm_policy       = var.asm_policy
+  tags             = var.tags
+  timezone         = var.timezone
+  ntp_server       = var.ntp_server
+  dns_server       = var.dns_server
 }
 
 module "applications" {

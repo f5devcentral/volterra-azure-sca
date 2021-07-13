@@ -1,13 +1,5 @@
 #BIG-IP AFM
 
-# resource "random_id" "randomId" {
-#   keepers = {
-#     # Generate a new ID only when a new resource group is defined
-#     resource_group = var.resource_group.name
-#   }
-#   byte_length = 8
-# }
-
 resource "azurerm_storage_account" "bigip_storageaccount" {
   name                     = "diag${var.projectPrefix}"
   resource_group_name      = var.resource_group.name
@@ -48,7 +40,7 @@ resource "azurerm_network_interface" "vm01-mgmt-nic" {
   tags = var.tags
 }
 
-resource "azurerm_network_interface_security_group_association" "bigip01-mgmt-nsg" {
+resource "azurerm_network_interface_security_group_association" "mgmt-nsg" {
   network_interface_id      = azurerm_network_interface.vm01-mgmt-nic.id
   network_security_group_id = var.security_group.id
 }
@@ -75,6 +67,18 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     private_ip_address_allocation = "Static"
     private_ip_address            = var.f5_t1_ext["f5vm01ext_sec"]
   }
+  ip_configuration {
+    name                          = "tertiary"
+    subnet_id                     = var.subnetExternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_ext["f5vm01ext_thi"]
+  }
+  ip_configuration {
+    name                          = "quarternary"
+    subnet_id                     = var.subnetExternal.id
+    private_ip_address_allocation = "Static"
+    private_ip_address            = var.f5_t1_ext["f5vm01ext_fou"]
+  }
 
   tags = {
     Name                      = "${var.projectPrefix}-vm01-ext-int"
@@ -86,6 +90,11 @@ resource "azurerm_network_interface" "vm01-ext-nic" {
     f5_cloud_failover_label   = "saca"
     f5_cloud_failover_nic_map = "external"
   }
+}
+
+resource "azurerm_network_interface_security_group_association" "app-nsg" {
+  network_interface_id      = azurerm_network_interface.vm01-ext-nic.id
+  network_security_group_id = var.app_security_group.id
 }
 
 # Create the third network interface card for Internal
@@ -136,16 +145,16 @@ data "http" "appservice" {
 data "template_file" "vm01_do_json" {
   template = data.http.onboard.body
   vars = {
-    host1           = var.hosts["host1"]
-    local_host      = var.hosts["host1"]
-    external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["external"]), 1)}"
-    internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
+    host1      = var.hosts["host1"]
+    local_host = var.hosts["host1"]
+    #external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["external"]), 1)}"
+    external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["internal"]), 1)}"
+    #internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
+    internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["inspect_int"]), 1)}"
     log_localip     = var.f5_t1_ext["f5vm01ext"]
     log_destination = var.app01ip
     appSubnet       = var.subnets["application"]
     vnetSubnet      = var.cidr
-    remote_host     = var.hosts["host2"]
-    remote_selfip   = var.f5_t1_ext["f5vm02ext"]
     externalGateway = local.ext_gw
     internalGateway = local.int_gw
     mgmtGateway     = local.mgmt_gw
@@ -163,18 +172,18 @@ data "template_file" "as3_json" {
   vars = {
     uuid                = random_uuid.as3_uuid.result
     baseline_waf_policy = var.asm_policy
-    exampleVipAddress   = var.f5_t1_ext["f5vm01ext"]
-    exampleVipSubnet    = var.subnets["external"]
-    rdp_pool_addresses  = var.winjumpip
-    ssh_pool_addresses  = var.linuxjumpip
+    exampleVipAddress   = var.f5_t1_ext["f5vm01ext_thi"]
+    exampleVipSubnet    = var.f5_t1_ext["f5vm01ext_thi"]
+    example_vs_address  = var.f5_t1_ext["f5vm01ext_thi"]
+    rdp_pool_addresses  = var.app01ip
+    ssh_pool_addresses  = var.app01ip
     app_pool_addresses  = var.app01ip
     ips_pool_addresses  = var.app01ip
     log_destination     = var.app01ip
-    example_vs_address  = var.subnets["external"]
-    mgmtVipAddress      = var.f5_t1_ext["f5vm01ext_sec"]
-    mgmtVipAddress2     = var.f5_t1_ext["f5vm02ext_sec"]
+    mgmtVipAddress      = var.f5_t1_ext["f5vm01ext"]
+    mgmtVipAddress2     = var.f5_t1_ext["f5vm01ext"]
     transitVipAddress   = var.f5_t1_int["f5vm01int_sec"]
-    transitVipAddress2  = var.f5_t1_int["f5vm02int_sec"]
+    transitVipAddress2  = var.f5_t1_int["f5vm01int_sec"]
   }
 }
 

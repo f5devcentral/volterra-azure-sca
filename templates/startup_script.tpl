@@ -245,3 +245,7 @@ do
         break
     fi
 done
+
+# add default route now that everything is good
+# hard coded right now, fix later
+tmsh create net route volterra network 0.0.0.0/0 gw 10.90.2.5;

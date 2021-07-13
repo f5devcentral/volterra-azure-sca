@@ -1,0 +1,107 @@
+{
+    "metadata": {
+        "name": "coleman-test-bed",
+        "namespace": "system",
+        "labels": {
+            "domain": "",
+            "host-os-version": "centos-7-2009-5",
+            "hw-model": "virtual-machine",
+            "hw-serial-number": "0000-0005-2659-6762-6236-2162-05",
+            "hw-vendor": "microsoft-corporation",
+            "hw-version": "7-0",
+            "provider": "AZURE",
+            "ves.io/fleet": "",
+            "ves.io/provider": "ves-io-AZURE",
+            "ves.io/siteType": "ves-io-ce"
+        },
+        "annotations": {},
+        "description": null,
+        "disable": null
+    },
+    "spec": {
+        "ingress_egress_gw": {
+            "no_network_policy": {},
+            "no_forward_proxy": {},
+            "inside_static_routes": {
+                "static_route_list": [
+                    {
+                        "custom_static_route": {
+                            "subnets": [
+                                {
+                                    "ipv4": {
+                                        "prefix": "10.90.0.0",
+                                        "plen": 16
+                                    }
+                                }
+                            ],
+                            "nexthop": {
+                                "type": "NEXT_HOP_USE_CONFIGURED",
+                                "nexthop_address": {
+                                    "ipv4": {
+                                        "addr": "10.90.2.1"
+                                    }
+                                },
+                                "interface": [
+                                    {
+                                        "kind": "network_interface",
+                                        "uid": null,
+                                        "tenant": "f5-sa-rnxeudss",
+                                        "namespace": "system",
+                                        "name": "ves-io-azure-vnet-site-coleman-test-bed-inside"
+                                    }
+                                ]
+                            },
+                            "labels": {},
+                            "attrs": [
+                                "ROUTE_ATTR_INSTALL_HOST",
+                                "ROUTE_ATTR_INSTALL_FORWARDING"
+                            ]
+                        }
+                    },
+                    {
+                        "custom_static_route": {
+                            "subnets": [
+                                {
+                                    "ipv4": {
+                                        "prefix": "0.0.0.0",
+                                        "plen": null
+                                    }
+                                }
+                            ],
+                            "nexthop": {
+                                "type": "NEXT_HOP_NETWORK_INTERFACE",
+                                "nexthop_address": {
+                                    "ipv4": {}
+                                },
+                                "interface": [
+                                    {
+                                        "kind": "network_interface",
+                                        "uid": null,
+                                        "tenant": "f5-sa-rnxeudss",
+                                        "namespace": "system",
+                                        "name": "ves-io-azure-vnet-site-coleman-test-bed-inside"
+                                    }
+                                ]
+                            },
+                            "labels": {},
+                            "attrs": [
+                                "ROUTE_ATTR_INSTALL_HOST",
+                                "ROUTE_ATTR_INSTALL_FORWARDING"
+                            ]
+                        }
+                    }
+                ]
+            },
+            "no_outside_static_routes": {},
+            "no_global_network": {}
+        },
+        "nodes_per_az": null,
+        "address": null,
+        "coordinates": {
+            "latitude": 29.4167,
+            "longitude": -98.5
+        },
+        "logs_streaming_disabled": {}
+    },
+    "resource_version": null
+}

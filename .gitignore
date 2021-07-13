@@ -36,3 +36,6 @@ prep.sh
 **/debug/*
 
 .DS_Store
+
+**/sites.json
+**/routes.json
