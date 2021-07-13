@@ -99,8 +99,8 @@ variable "azure_subnets" {
     "management"  = "10.90.0.0/24"
     "external"    = "10.90.1.0/24"
     "internal"    = "10.90.2.0/24"
-    "inspect_ext" = "10.90.4.0/24"
-    "inspect_int" = "10.90.5.0/24"
+    "inspect_ext" = "10.90.3.0/24"
+    "inspect_int" = "10.90.4.0/24"
     "application" = "10.90.10.0/24"
   }
 }
@@ -119,10 +119,10 @@ variable "f5_t1_ext" {
   description = "Tier 1 BIG-IP External IPs.  These must be in the external subnet."
   type        = map(string)
   default = {
-    f5vm01ext     = "10.90.4.14"
-    f5vm01ext_sec = "10.90.4.11"
-    f5vm02ext     = "10.90.4.15"
-    f5vm02ext_sec = "10.90.4.12"
+    f5vm01ext     = "10.90.2.14"
+    f5vm01ext_sec = "10.90.2.11"
+    f5vm01ext_thi = "10.90.2.12"
+    f5vm01ext_fou = "10.90.2.13"
   }
 }
 
@@ -130,10 +130,8 @@ variable "f5_t1_int" {
   description = "Tier 1 BIG-IP Internal IPs.  These must be in the internal subnet."
   type        = map(string)
   default = {
-    f5vm01int     = "10.90.5.14"
-    f5vm01int_sec = "10.90.5.11"
-    f5vm02int     = "10.90.5.15"
-    f5vm02int_sec = "10.90.5.12"
+    f5vm01int     = "10.90.4.14"
+    f5vm01int_sec = "10.90.4.11"
   }
 }
 
@@ -144,22 +142,6 @@ variable "app01ip" {
   default     = "10.90.10.101"
 }
 
-# Example IPS private ips
-variable "ips01ext" { default = "10.90.4.4" }
-variable "ips01int" { default = "10.90.5.4" }
-variable "ips01mgmt" { default = "10.90.0.8" }
-
-variable "winjumpip" {
-  type        = string
-  description = "REQUIRED: Used by all use-cases for RDP/Windows Jumpbox, must reside in VDMS subnet."
-  default     = "10.90.3.98"
-}
-
-variable "linuxjumpip" {
-  type        = string
-  description = "REQUIRED: Used by all use-cases for SSH/Linux Jumpbox, must reside in VDMS subnet."
-  default     = "10.90.3.99"
-}
 
 # BIGIP Instance Type, DS5_v2 is a solid baseline for BEST
 variable "instanceType" { default = "Standard_DS5_v2" }

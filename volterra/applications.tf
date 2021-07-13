@@ -11,10 +11,10 @@ resource "volterra_origin_pool" "kibana" {
   # Default: "DISTRIBUTED"
   # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
   # Policy for selection of endpoints from local site/remote site/both
-  endpoint_selection = "LOCAL_ONLY"
+  endpoint_selection = "LOCAL_PREFERRED"
   #Default: "ROUND_ROBIN"
   #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
-  loadbalancer_algorithm = "ROUND_ROBIN"
+  loadbalancer_algorithm = "LEAST_REQUEST"
 
   origin_servers {
     private_ip {
@@ -30,16 +30,17 @@ resource "volterra_origin_pool" "kibana" {
 
   }
 
-  port = "8089"
+  port = "5601"
 
   no_tls = true
 
 }
 
-resource "volterra_origin_pool" "elastic" {
-  name      = format("%s-elastic-pool", var.name)
+resource "volterra_origin_pool" "elastic_json" {
+  name      = format("%s-elastic-json-pool", var.name)
   namespace = var.namespace
   labels    = var.tags
+
   depends_on = [
     volterra_tf_params_action.action_test
   ]
@@ -47,10 +48,10 @@ resource "volterra_origin_pool" "elastic" {
   # Default: "DISTRIBUTED"
   # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
   # Policy for selection of endpoints from local site/remote site/both
-  endpoint_selection = "LOCAL_ONLY"
+  endpoint_selection = "LOCAL_PREFERRED"
   #Default: "ROUND_ROBIN"
   #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
-  loadbalancer_algorithm = "ROUND_ROBIN"
+  loadbalancer_algorithm = "LEAST_REQUEST"
 
   origin_servers {
     private_ip {
@@ -66,7 +67,43 @@ resource "volterra_origin_pool" "elastic" {
 
   }
 
-  port = "8088"
+  port = "9200"
+
+  no_tls = true
+
+}
+resource "volterra_origin_pool" "elastic_transport" {
+  name      = format("%s-elastic-transport-pool", var.name)
+  namespace = var.namespace
+  labels    = var.tags
+
+  depends_on = [
+    volterra_tf_params_action.action_test
+  ]
+
+  # Default: "DISTRIBUTED"
+  # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
+  # Policy for selection of endpoints from local site/remote site/both
+  endpoint_selection = "LOCAL_PREFERRED"
+  #Default: "ROUND_ROBIN"
+  #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
+  loadbalancer_algorithm = "LEAST_REQUEST"
+
+  origin_servers {
+    private_ip {
+      ip             = var.bigip_external
+      inside_network = true
+      site_locator {
+        site {
+          namespace = "system"
+          name      = volterra_azure_vnet_site.azure_site.name
+        }
+      }
+    }
+
+  }
+
+  port = "9300"
 
   no_tls = true
 
@@ -84,10 +121,10 @@ resource "volterra_origin_pool" "prometheus" {
   # Default: "DISTRIBUTED"
   # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
   # Policy for selection of endpoints from local site/remote site/both
-  endpoint_selection = "LOCAL_ONLY"
+  endpoint_selection = "LOCAL_PREFERRED"
   #Default: "ROUND_ROBIN"
   #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
-  loadbalancer_algorithm = "ROUND_ROBIN"
+  loadbalancer_algorithm = "LEAST_REQUEST"
 
   origin_servers {
     private_ip {
@@ -103,7 +140,7 @@ resource "volterra_origin_pool" "prometheus" {
 
   }
 
-  port = "8080"
+  port = "9090"
 
   no_tls = true
 
@@ -121,10 +158,10 @@ resource "volterra_origin_pool" "juiceshop" {
   # Default: "DISTRIBUTED"
   # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
   # Policy for selection of endpoints from local site/remote site/both
-  endpoint_selection = "LOCAL_ONLY"
+  endpoint_selection = "LOCAL_PREFERRED"
   #Default: "ROUND_ROBIN"
   #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
-  loadbalancer_algorithm = "ROUND_ROBIN"
+  loadbalancer_algorithm = "LEAST_REQUEST"
 
   origin_servers {
     private_ip {
@@ -154,8 +191,8 @@ resource "volterra_origin_pool" "juiceshop" {
 
 }
 
-resource "volterra_origin_pool" "logstash" {
-  name      = format("%s-logstash-pool", var.name)
+resource "volterra_origin_pool" "logstash_beats" {
+  name      = format("%s-logstash-beats-pool", var.name)
   namespace = var.namespace
   labels    = var.tags
 
@@ -166,10 +203,10 @@ resource "volterra_origin_pool" "logstash" {
   # Default: "DISTRIBUTED"
   # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
   # Policy for selection of endpoints from local site/remote site/both
-  endpoint_selection = "LOCAL_ONLY"
+  endpoint_selection = "LOCAL_PREFERRED"
   #Default: "ROUND_ROBIN"
   #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
-  loadbalancer_algorithm = "ROUND_ROBIN"
+  loadbalancer_algorithm = "LEAST_REQUEST"
 
   origin_servers {
     private_ip {
@@ -185,18 +222,56 @@ resource "volterra_origin_pool" "logstash" {
 
   }
 
-  port = "8090"
+  port = "5044"
 
   no_tls = true
 
 }
+
+resource "volterra_origin_pool" "logstash_api" {
+  name      = format("%s-logstash-api-pool", var.name)
+  namespace = var.namespace
+  labels    = var.tags
+
+  depends_on = [
+    volterra_tf_params_action.action_test
+  ]
+
+  # Default: "DISTRIBUTED"
+  # Enum: "DISTRIBUTED" "LOCAL_ONLY" "LOCAL_PREFERRED"
+  # Policy for selection of endpoints from local site/remote site/both
+  endpoint_selection = "LOCAL_PREFERRED"
+  #Default: "ROUND_ROBIN"
+  #Enum: "ROUND_ROBIN" "LEAST_REQUEST" "RING_HASH" "RANDOM" "LB_OVERRIDE"
+  loadbalancer_algorithm = "LEAST_REQUEST"
+
+  origin_servers {
+    private_ip {
+      ip             = var.bigip_external
+      inside_network = true
+      site_locator {
+        site {
+          namespace = "system"
+          name      = volterra_azure_vnet_site.azure_site.name
+        }
+      }
+    }
+
+  }
+
+  port = "9600"
+
+  no_tls = true
+
+}
+
 
 resource "volterra_http_loadbalancer" "kibana" {
   name      = format("%s-kibana-lb", var.name)
   namespace = var.namespace
 
   depends_on = [
-    volterra_origin_pool.kibana
+    volterra_tf_params_action.action_test, volterra_origin_pool.kibana
   ]
 
   // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set
@@ -244,12 +319,12 @@ resource "volterra_http_loadbalancer" "kibana" {
 
 }
 
-resource "volterra_http_loadbalancer" "elastic" {
-  name      = format("%s-elastic-lb", var.name)
+resource "volterra_http_loadbalancer" "elastic_json" {
+  name      = format("%s-elastic-json-lb", var.name)
   namespace = var.namespace
 
   depends_on = [
-    volterra_origin_pool.elastic
+    volterra_tf_params_action.action_test, volterra_origin_pool.elastic_json
   ]
 
   // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set
@@ -289,7 +364,111 @@ resource "volterra_http_loadbalancer" "elastic" {
   default_route_pools {
     endpoint_subsets = null
     pool {
-      name      = format("%s-elastic-pool", var.name)
+      name      = format("%s-elastic-json-pool", var.name)
+      namespace = var.namespace
+    }
+  }
+
+}
+
+resource "volterra_http_loadbalancer" "prometheus" {
+  name      = format("%s-prometheus-lb", var.name)
+  namespace = var.namespace
+
+  depends_on = [
+    volterra_tf_params_action.action_test, volterra_origin_pool.prometheus
+  ]
+
+  // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set
+  advertise_on_public_default_vip = true
+
+  // One of the arguments from this list "no_challenge js_challenge captcha_challenge policy_based_challenge" must be set
+  no_challenge = true
+
+  domains = ["prometheus.${var.delegated_domain}"]
+
+  // One of the arguments from this list "round_robin least_active random source_ip_stickiness cookie_stickiness ring_hash" must be set
+
+  round_robin = true
+
+  // One of the arguments from this list "https_auto_cert https http" must be set
+
+  //Stop waisting certs for testing!
+  http {
+    dns_volterra_managed = true
+  }
+
+  # https_auto_cert {
+  #   add_hsts      = true
+  #   http_redirect = true
+  #   no_mtls       = true
+
+  # }
+  // One of the arguments from this list "disable_rate_limit rate_limit" must be set
+  disable_rate_limit = true
+  // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
+  service_policies_from_namespace = true
+
+  // One of the arguments from this list "waf waf_rule disable_waf" must be set
+
+  disable_waf = true
+
+  default_route_pools {
+    endpoint_subsets = null
+    pool {
+      name      = format("%s-prometheus-pool", var.name)
+      namespace = var.namespace
+    }
+  }
+
+}
+
+resource "volterra_http_loadbalancer" "logstash_api" {
+  name      = format("%s-logstash-api-lb", var.name)
+  namespace = var.namespace
+
+  depends_on = [
+    volterra_tf_params_action.action_test, volterra_origin_pool.logstash_api
+  ]
+
+  // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set
+  advertise_on_public_default_vip = true
+
+  // One of the arguments from this list "no_challenge js_challenge captcha_challenge policy_based_challenge" must be set
+  no_challenge = true
+
+  domains = ["logstash.${var.delegated_domain}"]
+
+  // One of the arguments from this list "round_robin least_active random source_ip_stickiness cookie_stickiness ring_hash" must be set
+
+  round_robin = true
+
+  // One of the arguments from this list "https_auto_cert https http" must be set
+
+  //Stop waisting certs for testing!
+  http {
+    dns_volterra_managed = true
+  }
+
+  # https_auto_cert {
+  #   add_hsts      = true
+  #   http_redirect = true
+  #   no_mtls       = true
+
+  # }
+  // One of the arguments from this list "disable_rate_limit rate_limit" must be set
+  disable_rate_limit = true
+  // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
+  service_policies_from_namespace = true
+
+  // One of the arguments from this list "waf waf_rule disable_waf" must be set
+
+  disable_waf = true
+
+  default_route_pools {
+    endpoint_subsets = null
+    pool {
+      name      = format("%s-logstash-api-pool", var.name)
       namespace = var.namespace
     }
   }
@@ -301,7 +480,7 @@ resource "volterra_http_loadbalancer" "juiceshop" {
   namespace = var.namespace
 
   depends_on = [
-    volterra_origin_pool.juiceshop
+    volterra_tf_params_action.action_test, volterra_origin_pool.juiceshop
   ]
 
   // One of the arguments from this list "do_not_advertise advertise_on_public_default_vip advertise_on_public advertise_custom" must be set

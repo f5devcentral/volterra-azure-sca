@@ -137,6 +137,30 @@ resource "azurerm_network_security_group" "app" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+  security_rule {
+    name                       = "allow_9600"
+    description                = "Allow 9600 access"
+    priority                   = 190
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "9600"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+  security_rule {
+    name                       = "allow_5044"
+    description                = "Allow 5044 access"
+    priority                   = 200
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "5044"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
   tags = var.tags
 }
 
