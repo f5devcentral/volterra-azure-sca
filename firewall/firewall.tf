@@ -151,7 +151,7 @@ data "template_file" "vm01_do_json" {
     external_selfip = "${var.f5_t1_ext["f5vm01ext"]}/${element(split("/", var.subnets["internal"]), 1)}"
     #internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["internal"]), 1)}"
     internal_selfip = "${var.f5_t1_int["f5vm01int"]}/${element(split("/", var.subnets["inspect_int"]), 1)}"
-    log_localip     = var.f5_t1_ext["f5vm01ext"]
+    log_localip     = var.f5_t1_int["f5vm01int"]
     log_destination = var.app01ip
     appSubnet       = var.subnets["application"]
     vnetSubnet      = var.cidr
