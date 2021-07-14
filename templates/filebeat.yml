@@ -1,14 +1,40 @@
-filebeat.config:
-  modules:
-    path: /etc/filebeat/modules.d/*.yml
-    reload.enabled: false
+# filebeat.config:
+#   modules:
+#     path: /etc/filebeat/modules.d/*.yml
+#     reload.enabled: false
+
+filebeat.modules:
+  - module: nginx
+    enabled: true
+  - module: f5
+    enabled: true
+  - module: system
+    enabled: true
+  - module: elasticsearch
+    enabled: true
 
 filebeat.inputs:
   - type: syslog
     format: auto
-    protocol.tcp:
-      host: "localhost:514"
-#filebeat.autodiscover:
-#  providers:
-#    - type: docker
-#      hints.enabled: true
+    enabled: true
+    protocol.udp:
+      host: "localhost:6514"
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/syslog
+
+output.elasticsearch:
+  hosts: ["elk:9200"]
+# output.logstash:
+#   hosts: ["elk:5044"]
+
+logging.level: info
+logging.to_files: true
+logging.files:
+  path: /var/log
+  name: filebeat
+  keepfiles: 7
+  permissions: 0644
+config.reload.automatic: true
+config.reload.interval: 15s
