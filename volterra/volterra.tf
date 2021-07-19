@@ -3,7 +3,7 @@ terraform {
   required_providers {
     volterra = {
       source  = "volterraedge/volterra"
-      version = "0.7.0"
+      version = "0.8.0"
     }
   }
 }
@@ -71,17 +71,21 @@ resource "volterra_azure_vnet_site" "azure_site" {
     namespace = "system"
   }
 
+  # new error when no worker nodes?
+  # nodes_per_az = 1
+  no_worker_nodes = true
+  # worker_nodes = 0
+
   // One of the arguments from this list "logs_streaming_disabled log_receiver" must be set
   logs_streaming_disabled = true
 
   vnet {
 
-    #primary_ipv4 = "10.90.0.0/16"  possibly add local route for this?
-
     existing_vnet {
       resource_group = var.resource_group_name
       vnet_name      = var.existing_vnet.name
     }
+
   }
 
   ingress_egress_gw {
@@ -115,7 +119,6 @@ resource "volterra_azure_vnet_site" "azure_site" {
               }
             }
             interface {
-
               namespace = "system"
               name      = "ves-io-azure-vnet-site-${format("%s-vnet-site", var.name)}-inside"
             }
