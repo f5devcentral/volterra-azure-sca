@@ -1,5 +1,6 @@
 # Volterra Azure Secure Cloud Gateway (SCA/SCG)
-Volterra version of SCA/SCCA/SACA
+
+Volterra version of SCA/SCCA/SACA.  What is that?  An example of a Secure Cloud Architecture using Volterra for Multi-Cloud Networking deployment of Cloud based Services via Volterra Application Delivery Network, with hardening BIG-IP Service Insertion (Azure PAYG BEST; AFM,ASM,APM,LTM) publishing ELK and small demo applications.  The goal of this solution is to provide a working demonstation and prototyping lab for anyone.
 
 <!--TOC-->
 
