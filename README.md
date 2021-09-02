@@ -18,11 +18,9 @@ Volterra version of SCA/SCCA/SACA
 
 ## To do
 
-- fix filebeat link to elk
 - hardcoded IP values for testing, fix.
-- flip elastic trasnsport to tcp vs http
+- flip elastic transport to tcp vs http
 - flip logstash_beats to tcp vs http
-- add log reciever in console, point to filebeat
 - mgmt partition is leftover from SACA, can destroy.
 - Azure Key Vaults takes 2m to provision. "module.azure.azurerm_key_vault.keyvault: Creation complete after 2m5s"
   - Doesnt work with runtime-init for some reason, troubleshoot later.
