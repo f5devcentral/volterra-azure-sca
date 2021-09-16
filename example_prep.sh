@@ -51,7 +51,7 @@ export TF_VAR_azure_client_id=`echo $spn | jq -r '.appId'`
 unset ARM_CLIENT_SECRET
 #export ARM_CLIENT_SECRET=`echo $spn | jq -r '.password'`
 export TF_VAR_azure_client_secret=`echo $spn | jq -r '.password'`
-#echo $spn | jq -r '.password'
+#echo $spn | jq -r '.password'histroy
 
 unset ARM_TENANT_ID
 export ARM_TENANT_ID=`az account show | jq -r '.tenantId'`
