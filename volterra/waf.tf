@@ -1,5 +1,5 @@
 resource "volterra_app_firewall" "default" {
-  name      = "${var.namespace}-default-waf"
+  name      = "${var.namespace}-tf-waf"
   namespace = var.namespace
 
   // One of the arguments from this list "allow_all_response_codes allowed_response_codes" must be set
