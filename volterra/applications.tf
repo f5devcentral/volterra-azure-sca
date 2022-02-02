@@ -265,6 +265,16 @@ resource "volterra_origin_pool" "logstash_api" {
 
 }
 
+resource "volterra_user_identification" "user_identification" {
+  name      = format("%s-user-ident", var.name)
+  namespace = var.namespace
+
+  rules {
+    // One of the arguments from this list "client_ip query_param_key http_header_name cookie_name none client_asn" must be set
+    client_ip = true
+  }
+}
+
 
 resource "volterra_http_loadbalancer" "kibana" {
   name      = format("%s-kibana-lb", var.name)
@@ -304,6 +314,44 @@ resource "volterra_http_loadbalancer" "kibana" {
   disable_rate_limit = true
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
   service_policies_from_namespace = true
+
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+
+  // One of the arguments from this list "user_id_client_ip user_identification" must be set
+
+  user_identification {
+    name      = format("%s-user-ident", var.name)
+    namespace = var.namespace
+    #tenant    = var.tenant
+  }
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
@@ -361,6 +409,27 @@ resource "volterra_http_loadbalancer" "elastic_json" {
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
   service_policies_from_namespace = true
 
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+
+  user_identification {
+    name      = format("%s-user-ident", var.name)
+    namespace = var.namespace
+    #tenant    = var.tenant
+  }
+
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
   #disable_waf = true
@@ -416,6 +485,27 @@ resource "volterra_http_loadbalancer" "prometheus" {
   disable_rate_limit = true
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
   service_policies_from_namespace = true
+
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+
+  user_identification {
+    name      = format("%s-user-ident", var.name)
+    namespace = var.namespace
+    #tenant    = var.tenant
+  }
 
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
@@ -473,6 +563,27 @@ resource "volterra_http_loadbalancer" "logstash_api" {
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
   service_policies_from_namespace = true
 
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+
+  user_identification {
+    name      = format("%s-user-ident", var.name)
+    namespace = var.namespace
+    #tenant    = var.tenant
+  }
+
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
   #disable_waf = true
@@ -529,6 +640,25 @@ resource "volterra_http_loadbalancer" "juiceshop" {
   // One of the arguments from this list "no_service_policies active_service_policies service_policies_from_namespace" must be set
   service_policies_from_namespace = true
 
+  single_lb_app {
+    // One of the arguments from this list "enable_discovery disable_discovery" must be set
+
+    enable_discovery {
+      // One of the arguments from this list "disable_learn_from_redirect_traffic enable_learn_from_redirect_traffic" must be set
+      disable_learn_from_redirect_traffic = true
+    }
+
+    // One of the arguments from this list "enable_ddos_detection disable_ddos_detection" must be set
+    enable_ddos_detection = true
+
+    // One of the arguments from this list "enable_malicious_user_detection disable_malicious_user_detection" must be set
+    enable_malicious_user_detection = true
+  }
+  user_identification {
+    name      = format("%s-user-ident", var.name)
+    namespace = var.namespace
+    #tenant    = var.tenant
+  }
   // One of the arguments from this list "waf waf_rule disable_waf" must be set
 
   #disable_waf = true
