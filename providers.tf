@@ -3,7 +3,7 @@ terraform {
   required_providers {
     volterrarm = {
       source  = "volterraedge/volterra"
-      version = "0.8.1"
+      version = "0.11.3"
     }
     azurerm = {
       version = "~> 2.30.0"
