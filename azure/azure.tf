@@ -5,7 +5,7 @@ data "azurerm_subscription" "primary" {}
 
 # Create a Resource Group for the new Virtual Machines
 resource "azurerm_resource_group" "main" {
-  name     = "${var.projectPrefix}_rg"
+  name     = "${var.projectPrefix}_main_rg"
   location = var.location
 
   tags = var.tags

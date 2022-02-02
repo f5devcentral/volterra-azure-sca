@@ -53,7 +53,7 @@ resource "volterra_azure_vnet_site" "azure_site" {
 
   azure_region = var.location
   #resource_group = var.resource_group_name
-  resource_group = "${var.projectPrefix}_volt_rg"
+  resource_group = var.resource_group_name
   ssh_key        = file(var.sshPublicKeyPath)
 
   machine_type = "Standard_D3_v2"
@@ -82,7 +82,7 @@ resource "volterra_azure_vnet_site" "azure_site" {
   vnet {
 
     existing_vnet {
-      resource_group = var.resource_group_name
+      resource_group = var.azure_resource_group_name
       vnet_name      = var.existing_vnet.name
     }
 
@@ -156,7 +156,7 @@ resource "volterra_azure_vnet_site" "azure_site" {
 
       outside_subnet {
         subnet {
-          subnet_resource_grp = var.resource_group_name
+          subnet_resource_grp = var.azure_resource_group_name
           vnet_resource_group = true
           subnet_name         = "external"
         }
@@ -164,7 +164,7 @@ resource "volterra_azure_vnet_site" "azure_site" {
 
       inside_subnet {
         subnet {
-          subnet_resource_grp = var.resource_group_name
+          subnet_resource_grp = var.azure_resource_group_name
           vnet_resource_group = true
           subnet_name         = "internal"
         }
@@ -187,7 +187,7 @@ data "azurerm_resources" "volterra_resource_group" {
   depends_on = [
     volterra_tf_params_action.action_test
   ]
-  name = "${var.projectPrefix}_volt_rg"
+  name = var.resource_group_name
 }
 
 data "azurerm_network_interface" "sli" {
@@ -195,7 +195,7 @@ data "azurerm_network_interface" "sli" {
     volterra_tf_params_action.action_test
   ]
   name                = "master-0-sli"
-  resource_group_name = "${var.projectPrefix}_volt_rg"
+  resource_group_name = var.resource_group_name
 }
 
 output "azure_network_interface_sli_ip" {
@@ -208,7 +208,7 @@ resource "azurerm_route_table" "route_table" {
     volterra_tf_params_action.action_test
   ]
   name                          = "rt-0"
-  resource_group_name           = "${var.projectPrefix}_volt_rg"
+  resource_group_name           = var.resource_group_name
   location                      = var.location
   disable_bgp_route_propagation = false
 }
@@ -218,7 +218,7 @@ resource "azurerm_route" "default" {
     volterra_tf_params_action.action_test
   ]
   name                = "default-route"
-  resource_group_name = "${var.projectPrefix}_volt_rg"
+  resource_group_name = var.resource_group_name
 
   route_table_name       = azurerm_route_table.route_table.name
   address_prefix         = "0.0.0.0/0"
@@ -239,7 +239,7 @@ data "azurerm_network_security_group" "security_group" {
     volterra_tf_params_action.action_test
   ]
   name                = "security-group"
-  resource_group_name = "${var.projectPrefix}_volt_rg"
+  resource_group_name = var.resource_group_name
 }
 
 resource "azurerm_subnet_network_security_group_association" "external_association" {
